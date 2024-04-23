@@ -40,6 +40,7 @@ function resetGame() {
 }
 
 function startGame() {
+    var lastUpdate = Date.now();
     if (gameIsRunning)
         return false;
 
@@ -49,10 +50,11 @@ function startGame() {
     player = new PlayerComponent(playerSize, playerSize, "blue", 235, groundY - playerSize)
     ground = new GameComponent(960, 30, "green", 0, groundY)
 
-    gameProcess = setInterval(() => updateGame(), frameDelay);
+    gameProcess = setInterval(updateGame, frameDelay);
     gameIsRunning = true;
 }
 
+var lastUpdate = Date.now(); // for dt
 var isKeyPressed = false;
 window.addEventListener('keydown', function (e) {
     if (e.key == " ")
@@ -66,12 +68,15 @@ window.addEventListener('keyup', function (e) {
 })
 
 function updateGame() {
+    var now = Date.now();
+    var deltaTime = (now - lastUpdate) / 10.0;
+    // after dt
     if (!gameIsRunning)
         return;
 
     if (getSpeedAmplifyingEvent())
-        gameSpeed += getSpeedAmplifier();
-    console.log("document.getElementById(difficulty).value: " + document.getElementById("difficulty").value)
+        gameSpeed += getSpeedAmplifier() * deltaTime;
+    //console.log("document.getElementById(difficulty).value: " + document.getElementById("difficulty").value)
 
     gameArea.clear();
     ground.draw();
@@ -92,13 +97,13 @@ function updateGame() {
 
             objects.push(new ObstacleComponent(xOrY ? size : minObstacleSize, height, "red", 960, y));
         }
-        objectSpawnCooldown = 50 / gameSpeed;
+        objectSpawnCooldown = 5;
     }
     else
-        objectSpawnCooldown--;
+        objectSpawnCooldown -= deltaTime;
 
     for (let obj of objects) {
-        obj.move(-3 * gameSpeed, 0);
+        obj.move(-3 * deltaTime, 0);
         if (obj.x < (0 - obj.width)) {
             objects.splice(objects.indexOf(obj), 1);
             continue;
@@ -120,12 +125,12 @@ function updateGame() {
         }
     }
     if (isKeyPressed) {
-        player.accelerate(-boost * gameSpeed);
+        player.accelerate(-boost * deltaTime);
     }
     else if (player.y < player.getGroundContactY()) {
-        player.accelerate(gravity * gameSpeed)
+        player.accelerate(gravity * deltaTime)
     }
-    player.calcMove();
+    player.calcMove(deltaTime);
     /*else if (player.y > groundY - player.height) {
         player.setPos(235, groundY - player.height)
     }*/
@@ -134,6 +139,9 @@ function updateGame() {
 
     document.getElementById("score").textContent = "Score: " + score;
     document.getElementById("speed").textContent = "Speed: " + (Math.round(gameSpeed * 100) / 100).toFixed(2);
+    // reset for dt
+    lastUpdate = now;
+    console.log(deltaTime);
 }
 
 class Point {

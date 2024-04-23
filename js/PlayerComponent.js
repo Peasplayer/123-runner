@@ -9,7 +9,7 @@ class PlayerComponent extends GameComponent {
         this.velocity += v;
     }
 
-    calcMove() {
+    calcMove(dt) {
         if (this.y + this.velocity > this.getGroundContactY()){
             this.y = this.getGroundContactY();
             this.velocity = 0;
@@ -19,6 +19,6 @@ class PlayerComponent extends GameComponent {
             this.velocity = 0;
         }
         else
-            this.y += this.velocity;
+            this.y += this.velocity * dt;
     }
 }
