@@ -69,7 +69,7 @@ window.addEventListener('keyup', function (e) {
 
 function updateGame() {
     var now = Date.now();
-    var deltaTime = (now - lastUpdate) / 10.0;
+    var deltaTime = (now - lastUpdate) / 10.0; // delta time in centi seconds
     // after dt
     if (!gameIsRunning)
         return;
@@ -97,7 +97,7 @@ function updateGame() {
 
             objects.push(new ObstacleComponent(xOrY ? size : minObstacleSize, height, "red", 960, y));
         }
-        objectSpawnCooldown = 5;
+        objectSpawnCooldown = 50;
     }
     else
         objectSpawnCooldown -= deltaTime;
@@ -141,7 +141,7 @@ function updateGame() {
     document.getElementById("speed").textContent = "Speed: " + (Math.round(gameSpeed * 100) / 100).toFixed(2);
     // reset for dt
     lastUpdate = now;
-    console.log(deltaTime);
+    //console.log(deltaTime); // now not used!
 }
 
 class Point {
