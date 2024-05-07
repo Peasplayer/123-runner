@@ -3,6 +3,7 @@ class PlayerComponent extends GameComponent {
         super(width, height, color, x, y)
 
         this.velocity = 0.0;
+        this.lives = 3;
     }
 
     accelerate(v) {
@@ -20,5 +21,32 @@ class PlayerComponent extends GameComponent {
         }
         else
             this.y += this.velocity * dt;
+    }
+
+    isAlive() {
+        return player.lives > 0;
+    }
+
+    gotDamaged(livesTaken) {
+        gameIsFrozen = true;
+        this.lives -= livesTaken;
+
+        var counter = 0;
+        var blinkAnimation = setInterval(() => {
+            if (counter >= 6) {
+                clearInterval(blinkAnimation);
+                gameIsFrozen = false;
+                return;
+            }
+
+            if (counter % 2 === 0){
+                this.color = "orange";
+            }
+            else {
+                this.color = "blue";
+            }
+
+            counter++;
+        }, 500);
     }
 }

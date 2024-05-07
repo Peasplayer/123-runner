@@ -4,6 +4,7 @@ var ground;
 var objects = [];
 
 var gameIsRunning = false;
+var gameIsFrozen = false;
 var gameProcess;
 var objectSpawnCooldown = 0;
 var gameSpeed = 1.0;
@@ -77,63 +78,73 @@ function updateGame() {
     if (!gameIsRunning)
         return;
 
-    if (getSpeedAmplifyingEvent())
-        gameSpeed += getSpeedAmplifier() * deltaTime;
-
     gameArea.clear();
     ground.draw();
 
-    if (objectSpawnCooldown <= 0) {
+    if (!gameIsFrozen) {
+        if (getSpeedAmplifyingEvent())
+            gameSpeed += getSpeedAmplifier() * deltaTime;
 
-        var chance = Math.random() * 100 + 1;
-        if (chance <= document.getElementById("difficulty").value) {
-            var size = Math.random() * maxObstacleMultiplier * minObstacleSize + minObstacleSize;
-            var xOrY = Math.random() * 2 <= 1;
-            var height = xOrY ? minObstacleSize : size;
-            var y = Math.random() * (groundY + 1) - height / 2;
-            if (y + height  > groundY)
-                y = groundY - height;
-                
-            if (y < 0)
-                y = 0;
+        if (objectSpawnCooldown <= 0) {
+            var chance = Math.random() * 100 + 1;
+            if (chance <= document.getElementById("difficulty").value) {
+                var size = Math.random() * maxObstacleMultiplier * minObstacleSize + minObstacleSize;
+                var xOrY = Math.random() * 2 <= 1;
+                var height = xOrY ? minObstacleSize : size;
+                var y = Math.random() * (groundY + 1) - height / 2;
+                if (y + height  > groundY)
+                    y = groundY - height;
 
-            objects.push(new ObstacleComponent(xOrY ? size : minObstacleSize, height, "red", 960, y));
+                if (y < 0)
+                    y = 0;
+
+                var newEnemy = new EnemyComponent(xOrY ? size : minObstacleSize, height, "red", 960, y);
+                newEnemy.collidesWithPlayer = (player) => {
+                    player.gotDamaged(1);
+                    objects = [];
+                };
+                objects.push(newEnemy);
+            }
+            objectSpawnCooldown = 50 / gameSpeed;
         }
-        objectSpawnCooldown = 50 / gameSpeed;
-    }
-    else
-        objectSpawnCooldown -= deltaTime;
+        else
+            objectSpawnCooldown -= deltaTime;
 
-    for (let obj of objects) {
-        obj.move(-3 * gameSpeed * deltaTime, 0);
-        if (obj.x < (0 - obj.width)) {
-            objects.splice(objects.indexOf(obj), 1);
-            continue;
+        for (let obj of objects) {
+            obj.move(-3 * gameSpeed * deltaTime, 0);
+            if (obj.x < (0 - obj.width)) {
+                objects.splice(objects.indexOf(obj), 1);
+                continue;
+            }
+
+            if (obj.x < (player.x - obj.width) && !obj.gavePoint) {
+                score++;
+                obj.gavePoint = true;
+                if (!getSpeedAmplifyingEvent())
+                    gameSpeed += getSpeedAmplifier();
+            }
+
+            obj.draw();
+
+            if (player.isTouching(obj)) {
+                obj.collidesWithPlayer(player);
+                if (!player.isAlive()) {
+                    player.color = "yellow";
+                    clearInterval(gameProcess);
+                    gameIsRunning = false;
+                }
+            }
         }
 
-        if (obj.x < (player.x - obj.width) && !obj.gavePoint) {
-            score++;
-            obj.gavePoint = true;
-            if (!getSpeedAmplifyingEvent())
-                gameSpeed += getSpeedAmplifier();
+        if (isKeyPressed) {
+            player.accelerate(-boost * gameSpeed * deltaTime);
         }
-
-        obj.draw();
-
-        if (player.isTouching(obj)) {
-            player.color = "yellow";
-            clearInterval(gameProcess);
-            gameIsRunning = false;
+        else if (player.y < player.getGroundContactY()) {
+            player.accelerate(gravity * gameSpeed * deltaTime)
         }
+        player.calcMove(deltaTime);
     }
 
-    if (isKeyPressed) {
-        player.accelerate(-boost * gameSpeed * deltaTime);
-    }
-    else if (player.y < player.getGroundContactY()) {
-        player.accelerate(gravity * gameSpeed * deltaTime)
-    }
-    player.calcMove(deltaTime);
     /*else if (player.y > groundY - player.height) {
         player.setPos(235, groundY - player.height)
     }*/

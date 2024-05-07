@@ -5,6 +5,8 @@ class GameComponent {
         this.color = color;
         this.x = x;
         this.y = y;
+
+        this.collidesWithPlayer = (player) => {};
     }
 
     getGroundContactY() {
