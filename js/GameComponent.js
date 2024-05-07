@@ -6,6 +6,8 @@ class GameComponent {
         this.x = x;
         this.y = y;
 
+        this.movingSpeed = 3;
+
         this.collidesWithPlayer = (player) => {};
     }
 
@@ -32,9 +34,9 @@ class GameComponent {
         return true;
     }
 
-    move(x, y) {
-        this.x += x;
-        this.y += y;
+    move(x, y, modifier) {
+        this.x += x * modifier;
+        this.y += y * modifier;
     }
     
     setPos(x, y) {

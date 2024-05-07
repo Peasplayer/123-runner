@@ -111,7 +111,7 @@ function updateGame() {
             objectSpawnCooldown -= deltaTime;
 
         for (let obj of objects) {
-            obj.move(-3 * gameSpeed * deltaTime, 0);
+            obj.move(-obj.movingSpeed, 0, gameSpeed * deltaTime);
             if (obj.x < (0 - obj.width)) {
                 objects.splice(objects.indexOf(obj), 1);
                 continue;
