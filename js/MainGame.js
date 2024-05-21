@@ -53,7 +53,7 @@ function startGame() {
     resetGame();
 
     gameArea.start();
-    player = new PlayerComponent(playerSize, playerSize, "blue", 235, groundY - playerSize)
+    player = new PlayerComponent(playerSize, playerSize, "blue", 235, (groundY - playerSize)/2)
     ground = new GameComponent(960, 30, "green", 0, groundY)
 
     gameProcess = setInterval(() => updateGame(), frameDelay);
@@ -146,12 +146,12 @@ function updateGame() {
         }
 
         if (player.y >= player.getGroundContactY() && FlorIsLava == true) {
-            gotDamaged(1);
-            player.y = player.getGroundContactY()+3;
+            player.gotDamaged(1);
+            player.y = (groundY - playerSize) / 4*3;
         }
         if (player.y <= 0 && FlorIsLava == true) {
-            gotDamaged(1);
-            player.y = 3;
+            player.gotDamaged(1);
+            player.y = (groundY - playerSize) / 4;
         }
         player.calcMove(deltaTime);
     }
