@@ -18,6 +18,8 @@ var boost = 0.2;
 var gravity = 0.3;
 var frameDelay = 1;
 
+var FlorIsLava = false;
+
 function getSpeedAmplifier() {
     return parseFloat(document.getElementById("speedAmplifier").value);
 }
@@ -141,6 +143,15 @@ function updateGame() {
         }
         else if (player.y < player.getGroundContactY()) {
             player.accelerate(gravity * gameSpeed * deltaTime)
+        }
+
+        if (player.y >= player.getGroundContactY() && FlorIsLava == true) {
+            gotDamaged(1);
+            player.y = player.getGroundContactY()+3;
+        }
+        if (player.y <= 0 && FlorIsLava == true) {
+            gotDamaged(1);
+            player.y = 3;
         }
         player.calcMove(deltaTime);
     }
