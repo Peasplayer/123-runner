@@ -11,21 +11,7 @@ var gameSpeed = 1.0;
 var score = 0;
 var lastUpdated = 0;
 
-var playerSize = 70;
-var minObstacleSize = 40;
-var maxObstacleMultiplier = 3;
-var boost = 0.2;
-var gravity = 0.3;
-var frameDelay = 1;
-
 var floorIsLava = false;
-
-function getSpeedAmplifier() {
-    return parseFloat(document.getElementById("speedAmplifier").value);
-}
-function getSpeedAmplifyingEvent() {
-    return document.getElementById("speedAmplifyingEvent").value === "frame";
-}
 
 const groundY = 450;
 
@@ -38,12 +24,8 @@ function resetGame() {
     score = 0;
     lastUpdated = Date.now();
 
-    playerSize = parseInt(document.getElementById("playerSize").value);
-    minObstacleSize = parseInt(document.getElementById("minObstacleSize").value);
-    maxObstacleMultiplier = parseInt(document.getElementById("maxObstacleMultiplier").value);
-    boost = parseFloat(document.getElementById("boost").value);
-    gravity = parseFloat(document.getElementById("gravity").value);
-    frameDelay = parseInt(document.getElementById("frameDelay").value);
+    if (Settings.currentOptions === undefined)
+        Settings.currentOptions = Settings.defaultOptions;
 }
 
 function startGame() {
@@ -53,10 +35,11 @@ function startGame() {
     resetGame();
 
     gameArea.start();
-    player = new PlayerComponent(playerSize, playerSize, "blue", 235, (floorIsLava ? (groundY - playerSize) *  0.5 : groundY - playerSize))
+    let playerSize = Settings.currentOptions.playerSize;
+    player = new PlayerComponent(playerSize, playerSize, "blue", 235,  (floorIsLava ? (groundY - playerSize) *  0.5 : groundY - playerSize));
     ground = new GameComponent(960, 30, "green", 0, groundY)
 
-    gameProcess = setInterval(() => updateGame(), frameDelay);
+    gameProcess = setInterval(() => updateGame(), 1);
     gameIsRunning = true;
 }
 
@@ -84,15 +67,15 @@ function updateGame() {
     ground.draw();
 
     if (!gameIsFrozen) {
-        if (getSpeedAmplifyingEvent())
-            gameSpeed += getSpeedAmplifier() * deltaTime;
+        if (Settings.currentOptions.speedAmplifyingEvent === "frame")
+            gameSpeed += Settings.currentOptions.speedAmplifier * deltaTime;
 
         if (objectSpawnCooldown <= 0) {
             var chance = Math.random() * 100 + 1;
-            if (chance <= document.getElementById("difficulty").value) {
-                var size = Math.random() * maxObstacleMultiplier * minObstacleSize + minObstacleSize;
+            if (chance <= Settings.currentOptions.difficulty) {
+                var size = Math.random() * Settings.currentOptions.maxObstacleMultiplier * Settings.currentOptions.minObstacleSize + Settings.currentOptions.minObstacleSize;
                 var xOrY = Math.random() * 2 <= 1;
-                var height = xOrY ? minObstacleSize : size;
+                var height = xOrY ? Settings.currentOptions.minObstacleSize : size;
                 var y = Math.random() * (groundY + 1) - height / 2;
                 if (y + height  > groundY)
                     y = groundY - height;
@@ -100,7 +83,11 @@ function updateGame() {
                 if (y < 0)
                     y = 0;
 
-                var newEnemy = new EnemyComponent(xOrY ? size : minObstacleSize, height, "red", 960, y);
+                var newEnemy = new EnemyComponent(xOrY ? size : Settings.currentOptions.minObstacleSize, height, "red", 960, y);
+                if (Math.random() < 0.33) {
+                    newEnemy.movingSpeed = 5;
+                    newEnemy.color = "purple";
+                }
                 newEnemy.collidesWithPlayer = (player) => {
                     player.gotDamaged(1);
                     objects = [];
@@ -122,8 +109,8 @@ function updateGame() {
             if (obj.x < (player.x - obj.width) && !obj.gavePoint) {
                 score++;
                 obj.gavePoint = true;
-                if (!getSpeedAmplifyingEvent())
-                    gameSpeed += getSpeedAmplifier();
+                if (Settings.currentOptions.speedAmplifyingEvent === "score")
+                    gameSpeed += Settings.currentOptions.speedAmplifier;
             }
 
             obj.draw();
@@ -139,10 +126,10 @@ function updateGame() {
         }
 
         if (isKeyPressed) {
-            player.accelerate(-boost * gameSpeed * deltaTime);
+            player.accelerate(-Settings.currentOptions.boost * gameSpeed * deltaTime);
         }
         else if (player.y < player.getGroundContactY()) {
-            player.accelerate(gravity * gameSpeed * deltaTime)
+            player.accelerate(Settings.currentOptions.gravity * gameSpeed * deltaTime)
         }
 
         if (player.y >= player.getGroundContactY() && floorIsLava) {
@@ -157,10 +144,6 @@ function updateGame() {
         player.calcMove(deltaTime);
     }
 
-    /*else if (player.y > groundY - player.height) {
-        player.setPos(235, groundY - player.height)
-    }*/
-    //console.log(player.y + " - " + player.velocity);
     player.draw();
 
     document.getElementById("score").textContent = "Score: " + score;
