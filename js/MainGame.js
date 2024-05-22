@@ -98,13 +98,11 @@ function updateGame() {
                 if (y < 0)
                     y = 0;
 
-                 var newEnemy;
-                 if(Math.random() >= 0.33)
-                     newEnemy = new EnemyComponent(xOrY ? size : minObstacleSize, height, "red", 960, y);
-                 else{
-                     newEnemy = new EnemyComponent(xOrY ? size : minObstacleSize, height, "purple", 960, y);
-                     newEnemy.movingSpeed = 5;
-                 }
+                var newEnemy = new EnemyComponent(xOrY ? size : minObstacleSize, height, "red", 960, y);
+                if (Math.random() < 0.33) {
+                    newEnemy.movingSpeed = 5;
+                    newEnemy.color = "purple";
+                }
                 newEnemy.collidesWithPlayer = (player) => {
                     player.gotDamaged(1);
                     objects = [];
