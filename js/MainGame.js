@@ -18,7 +18,7 @@ var boost = 0.2;
 var gravity = 0.3;
 var frameDelay = 1;
 
-var FlorIsLava = false;
+var floorIsLava = false;
 
 function getSpeedAmplifier() {
     return parseFloat(document.getElementById("speedAmplifier").value);
@@ -53,7 +53,7 @@ function startGame() {
     resetGame();
 
     gameArea.start();
-    player = new PlayerComponent(playerSize, playerSize, "blue", 235, (groundY - playerSize)/2)
+    player = new PlayerComponent(playerSize, playerSize, "blue", 235, (floorIsLava ? (groundY - playerSize) *  0.5 : groundY - playerSize))
     ground = new GameComponent(960, 30, "green", 0, groundY)
 
     gameProcess = setInterval(() => updateGame(), frameDelay);
@@ -145,14 +145,15 @@ function updateGame() {
             player.accelerate(gravity * gameSpeed * deltaTime)
         }
 
-        if (player.y >= player.getGroundContactY() && FlorIsLava == true) {
+        if (player.y >= player.getGroundContactY() && floorIsLava) {
             player.gotDamaged(1);
             player.y = (groundY - playerSize) / 4*3;
         }
-        if (player.y <= 0 && FlorIsLava == true) {
+        if (player.y <= 0 && floorIsLava) {
             player.gotDamaged(1);
             player.y = (groundY - playerSize) / 4;
         }
+
         player.calcMove(deltaTime);
     }
 
