@@ -81,6 +81,10 @@ function updateGame() {
                     y = 0;
 
                 var newEnemy = new EnemyComponent(xOrY ? size : Settings.currentOptions.minObstacleSize, height, "red", 960, y);
+                if (Math.random() < 0.33) {
+                    newEnemy.movingSpeed = 5;
+                    newEnemy.color = "purple";
+                }
                 newEnemy.collidesWithPlayer = (player) => {
                     player.gotDamaged(1);
                     objects = [];
