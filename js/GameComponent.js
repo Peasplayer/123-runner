@@ -11,6 +11,20 @@ class GameComponent {
         this.collidesWithPlayer = (player) => {};
     }
 
+    shootProjectile() {
+        var newProjectile = new GameComponent(10, 10, "green", this.x, this.y + this.height / 2);
+        this.projejctiles.push(newProjectile);
+        };
+    }
+
+    updateProjectiles() {
+        for (let i = 0; i < this.projejctiles.length; i++) {
+            let proj = this.projejctiles[i];
+            proj.x += proj.movingSpeed; 
+        }
+    }
+
+
     getGroundContactY() {
         return groundY - this.height;
     }
@@ -34,6 +48,8 @@ class GameComponent {
         return true;
     }
 
+    
+
     move(x, y, modifier) {
         this.x += x * modifier;
         this.y += y * modifier;
@@ -49,4 +65,3 @@ class GameComponent {
         ctx.fillStyle = this.color;
         ctx.fillRect(this.x, this.y, this.width, this.height);
     }
-}

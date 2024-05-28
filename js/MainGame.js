@@ -46,6 +46,8 @@ window.addEventListener('keydown', function (e) {
         isKeyPressed = true;
     if (e.key == "s")
         startGame();
+    if (e.key == "r")
+        shootprojectile();
 })
 window.addEventListener('keyup', function (e) {
     if (e.key == " ")
