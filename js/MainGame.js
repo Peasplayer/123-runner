@@ -81,10 +81,15 @@ function updateGame() {
                     y = 0;
 
                 var newEnemy = new EnemyComponent(xOrY ? size : Settings.currentOptions.minObstacleSize, height, "red", 960, y);
-                if (Math.random() < 0.33) {
+                if (Math.random() < 0.25) { // add a slider?
                     newEnemy.movingSpeed = 5;
                     newEnemy.color = "purple";
-                }
+                }else if(Math.random() < 0.25){ // do something else?
+                    newEnemy.height = 50;
+                    newEnemy.width = 50;
+                    newEnemy.color = "lime";
+                    newEnemy.willFall = true;
+		}
                 newEnemy.collidesWithPlayer = (player) => {
                     player.gotDamaged(1);
                     objects = [];
@@ -97,7 +102,7 @@ function updateGame() {
             objectSpawnCooldown -= deltaTime;
 
         for (let obj of objects) {
-            obj.move(-obj.movingSpeed, 0, gameSpeed * deltaTime);
+            obj.move(-obj.movingSpeed, obj.deltaY, gameSpeed * deltaTime);
             if (obj.x < (0 - obj.width)) {
                 objects.splice(objects.indexOf(obj), 1);
                 continue;
