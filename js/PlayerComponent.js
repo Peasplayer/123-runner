@@ -49,4 +49,24 @@ class PlayerComponent extends GameComponent {
             counter++;
         }, 500);
     }
+    collectPowerUp(){
+        this.lives++;
+        var counter = 0;
+        var blinkAnimation = setInterval(() => {
+            if (counter >= 4) {
+                clearInterval(blinkAnimation);
+                gameIsFrozen = false;
+                return;
+            }
+
+            if (counter % 2 === 0){
+                this.color = "green";
+            }
+            else {
+                this.color = "blue";
+            }
+
+            counter++;
+        }, 200);
+    }
 }

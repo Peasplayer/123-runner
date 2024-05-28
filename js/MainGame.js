@@ -7,6 +7,7 @@ var gameIsRunning = false;
 var gameIsFrozen = false;
 var gameProcess;
 var objectSpawnCooldown = 0;
+var objectPowerUpSpawnCooldown = 0;
 var gameSpeed = 1.0;
 var score = 0;
 var lastUpdated = 0;
@@ -18,6 +19,7 @@ function resetGame() {
 
     objects = [];
     objectSpawnCooldown = 0;
+    objectPowerUpSpawnCooldown = 0;
     gameSpeed = 1.0;
     score = 0;
     lastUpdated = Date.now();
@@ -95,6 +97,29 @@ function updateGame() {
         }
         else
             objectSpawnCooldown -= deltaTime;
+
+        if (objectPowerUpSpawnCooldown <= 0) {
+            var chance = Math.random() * 100 + 1;
+            if (chance <= 50) {
+                var height = Settings.currentOptions.minObstacleSize;
+                var y = Math.random() * (groundY + 1) - height / 2;
+                if (y + height  > groundY)
+                    y = groundY - height;
+
+                if (y < 0)
+                    y = 0;
+
+                var newPowerUp = new PowerUpComponent(Settings.currentOptions.minObstacleSize, height, "black", 960, y);
+                newPowerUp.collidesWithPlayer = (Player) => {
+                    player.collectPowerUp();
+                    objects.splice(objects.indexOf(newPowerUp), 1);
+                }
+                objects.push(newPowerUp);
+            }
+            objectPowerUpSpawnCooldown = 100 / gameSpeed;
+        }
+        else
+            objectPowerUpSpawnCooldown -= deltaTime;
 
         for (let obj of objects) {
             obj.move(-obj.movingSpeed, 0, gameSpeed * deltaTime);
