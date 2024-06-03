@@ -1,7 +1,6 @@
 class PlayerComponent extends GameComponent {
     constructor(width, height, color, x, y) {
-        super(width, height, color, x, y)
-
+        super(width, height, color, x, y);
         this.velocity = 0.0;
         this.lives = 3;
     }
@@ -11,26 +10,24 @@ class PlayerComponent extends GameComponent {
     }
 
     calcMove(dt) {
-        if (this.y + this.velocity > this.getGroundContactY()){
+        if (this.y + this.velocity > this.getGroundContactY()) {
             this.y = this.getGroundContactY();
             this.velocity = 0;
-        }
-        else if (this.y + this.velocity < 0){
+        } else if (this.y + this.velocity < 0) {
             this.y = 0;
             this.velocity = 0;
-        }
-        else
+        } else {
             this.y += this.velocity * dt;
+        }
     }
 
     isAlive() {
-        return player.lives > 0;
+        return this.lives > 0;
     }
 
     gotDamaged(livesTaken) {
         gameIsFrozen = true;
         this.lives -= livesTaken;
-
         var counter = 0;
         var blinkAnimation = setInterval(() => {
             if (counter >= 6) {
@@ -38,14 +35,11 @@ class PlayerComponent extends GameComponent {
                 gameIsFrozen = false;
                 return;
             }
-
-            if (counter % 2 === 0){
+            if (counter % 2 === 0) {
                 this.color = "orange";
-            }
-            else {
+            } else {
                 this.color = "blue";
             }
-
             counter++;
         }, 500);
     }

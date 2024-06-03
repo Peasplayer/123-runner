@@ -6,29 +6,29 @@ class GameComponent {
         this.x = x;
         this.y = y;
         this.movingSpeed = 3;
-        this.projecil = [];
+        this.projectiles = [];
         this.collidesWithPlayer = (player) => {};
     }
-
 
     shootProjectile() {
         let newProjectile = new GameComponent(10, 10, "green", this.x + this.width, this.y + this.height / 2);
         newProjectile.movingSpeed = 5;
-        this.projecil.push(newProjectile);
+        this.projectiles.push(newProjectile);
     }
 
-    updateProjecil() {
-        for (let i = 0; i < this.projecil.length; i++) {
-            let proj = this.projecil[i];
+    updateProjectiles() {
+        for (let i = 0; i < this.projectiles.length; i++) {
+            let proj = this.projectiles[i];
             proj.x += proj.movingSpeed;
             if (proj.x > gameArea.canvas.width) {
-                this.projecil.splice(i, 1);
+                this.projectiles.splice(i, 1);
                 i--;
             }
         }
     }
-    drawProjecil() {
-        for (let proj of this.projecil) {
+
+    drawProjectiles() {
+        for (let proj of this.projectiles) {
             proj.draw();
         }
     }
@@ -38,24 +38,23 @@ class GameComponent {
     }
 
     isTouching(comp) {
-        var pointA1 = new Point(this.x + 3, this.y + 3);
-        var pointA2 = new Point(this.x + this.width - 3, this.y + this.height - 3);
-
-        var pointB1 = new Point(comp.x, comp.y);
-        var pointB2 = new Point(comp.x + comp.width, comp.y + comp.height);
-
-        if (pointA1.x > pointB2.x || pointB1.x > pointA2.x)
+         var pointA1 = new Point(this.x + 3, this.y + 3);
+         var pointA2 = new Point(this.x + this.width - 3, this.y + this.height - 3);
+    
+         var pointB1 = new Point(comp.x, comp.y);
+         var pointB2 = new Point(comp.x + comp.width, comp.y + comp.height);
+    
+         if (pointA1.x > pointB2.x || pointB1.x > pointA2.x)
             return false;
-
-        if (pointA1.y > pointB2.y || pointB1.y > pointA2.y)
-            return false;
-
-        /*if (minX <= comp.x && maxX >= comp.x && minY <= comp.y && maxY >= comp.y)
-            return true;*/
-
-        return true;
-    }
-
+    
+         if (pointA1.y > pointB2.y || pointB1.y > pointA2.y)
+                return false;
+    
+         /*if (minX <= comp.x && maxX >= comp.x && minY <= comp.y && maxY >= comp.y)
+                return true;*/
+    
+          return true;
+        }
     
 
     move(x, y, modifier) {

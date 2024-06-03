@@ -2,7 +2,6 @@ var gameArea;
 var player;
 var ground;
 var objects = [];
-
 var gameIsRunning = false;
 var gameIsFrozen = false;
 var gameProcess;
@@ -15,7 +14,6 @@ const groundY = 450;
 
 function resetGame() {
     gameArea = new GameArea();
-
     objects = [];
     objectSpawnCooldown = 0;
     gameSpeed = 1.0;
@@ -31,11 +29,9 @@ function startGame() {
         return false;
 
     resetGame();
-
     gameArea.start();
-    player = new PlayerComponent(Settings.currentOptions.playerSize, Settings.currentOptions.playerSize, "blue", 235, groundY - Settings.currentOptions.playerSize)
-    ground = new GameComponent(960, 30, "green", 0, groundY)
-
+    player = new PlayerComponent(Settings.currentOptions.playerSize, Settings.currentOptions.playerSize, "blue", 235, groundY - Settings.currentOptions.playerSize);
+    ground = new GameComponent(960, 30, "green", 0, groundY);
     gameProcess = setInterval(() => updateGame(), 1);
     gameIsRunning = true;
 }
@@ -43,7 +39,8 @@ function startGame() {
 function shootProjectile() {
     if (player) {
         player.shootProjectile();
-    }}
+    }
+}
 
 var isKeyPressed = false;
 window.addEventListener('keydown', function (e) {
@@ -51,18 +48,19 @@ window.addEventListener('keydown', function (e) {
         isKeyPressed = true;
     if (e.key == "s")
         startGame();
-    if (e.key == "r")
+    if (e.key == "r") {
         shootProjectile();
-})
+    }
+});
+
 window.addEventListener('keyup', function (e) {
     if (e.key == " ")
         isKeyPressed = false;
-})
+});
 
 function updateGame() {
     var now = Date.now();
-    var deltaTime = (now - lastUpdated) / 10.0; // delta time in centi seconds
-    // after dt
+    var deltaTime = (now - lastUpdated) / 10.0;
 
     if (!gameIsRunning)
         return;
@@ -81,12 +79,10 @@ function updateGame() {
                 var xOrY = Math.random() * 2 <= 1;
                 var height = xOrY ? Settings.currentOptions.minObstacleSize : size;
                 var y = Math.random() * (groundY + 1) - height / 2;
-                if (y + height  > groundY)
+                if (y + height > groundY)
                     y = groundY - height;
-
                 if (y < 0)
                     y = 0;
-
                 var newEnemy = new EnemyComponent(xOrY ? size : Settings.currentOptions.minObstacleSize, height, "red", 960, y);
                 if (Math.random() < 0.33) {
                     newEnemy.movingSpeed = 5;
@@ -99,9 +95,9 @@ function updateGame() {
                 objects.push(newEnemy);
             }
             objectSpawnCooldown = 50 / gameSpeed;
-        }
-        else
+        } else {
             objectSpawnCooldown -= deltaTime;
+        }
 
         for (let obj of objects) {
             obj.move(-obj.movingSpeed, 0, gameSpeed * deltaTime);
@@ -109,16 +105,13 @@ function updateGame() {
                 objects.splice(objects.indexOf(obj), 1);
                 continue;
             }
-
             if (obj.x < (player.x - obj.width) && !obj.gavePoint) {
                 score++;
                 obj.gavePoint = true;
                 if (Settings.currentOptions.speedAmplifyingEvent === "score")
                     gameSpeed += Settings.currentOptions.speedAmplifier;
             }
-
             obj.draw();
-
             if (player.isTouching(obj)) {
                 obj.collidesWithPlayer(player);
                 if (!player.isAlive()) {
@@ -131,11 +124,12 @@ function updateGame() {
 
         if (isKeyPressed) {
             player.accelerate(-Settings.currentOptions.boost * gameSpeed * deltaTime);
-        }
-        else if (player.y < player.getGroundContactY()) {
-            player.accelerate(Settings.currentOptions.gravity * gameSpeed * deltaTime)
+        } else if (player.y < player.getGroundContactY()) {
+            player.accelerate(Settings.currentOptions.gravity * gameSpeed * deltaTime);
         }
         player.calcMove(deltaTime);
+        player.updateProjectiles();
+        player.drawProjectiles();
     }
 
     player.draw();
