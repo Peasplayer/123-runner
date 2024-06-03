@@ -5,25 +5,33 @@ class GameComponent {
         this.color = color;
         this.x = x;
         this.y = y;
-
         this.movingSpeed = 3;
-
+        this.projecil = [];
         this.collidesWithPlayer = (player) => {};
     }
 
+
     shootProjectile() {
-        var newProjectile = new GameComponent(10, 10, "green", this.x, this.y + this.height / 2);
-        this.projejctiles.push(newProjectile);
-        };
+        let newProjectile = new GameComponent(10, 10, "green", this.x + this.width, this.y + this.height / 2);
+        newProjectile.movingSpeed = 5;
+        this.projecil.push(newProjectile);
     }
 
-    updateProjectiles() {
-        for (let i = 0; i < this.projejctiles.length; i++) {
-            let proj = this.projejctiles[i];
-            proj.x += proj.movingSpeed; 
+    updateProjecil() {
+        for (let i = 0; i < this.projecil.length; i++) {
+            let proj = this.projecil[i];
+            proj.x += proj.movingSpeed;
+            if (proj.x > gameArea.canvas.width) {
+                this.projecil.splice(i, 1);
+                i--;
+            }
         }
     }
-
+    drawProjecil() {
+        for (let proj of this.projecil) {
+            proj.draw();
+        }
+    }
 
     getGroundContactY() {
         return groundY - this.height;
@@ -65,3 +73,4 @@ class GameComponent {
         ctx.fillStyle = this.color;
         ctx.fillRect(this.x, this.y, this.width, this.height);
     }
+}
