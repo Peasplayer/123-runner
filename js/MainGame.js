@@ -30,8 +30,9 @@ function startGame() {
 
     resetGame();
     gameArea.start();
-    player = new PlayerComponent(Settings.currentOptions.playerSize, Settings.currentOptions.playerSize, "blue", 235, groundY - Settings.currentOptions.playerSize);
-    ground = new GameComponent(960, 30, "green", 0, groundY);
+    player = new PlayerComponent(Settings.currentOptions.playerSize, Settings.currentOptions.playerSize, "blue", 235, groundY - Settings.currentOptions.playerSize, 1)
+    ground = new GameComponent(960, 30, "green", 0, groundY, -1)
+
     gameProcess = setInterval(() => updateGame(), 1);
     gameIsRunning = true;
 }
@@ -99,6 +100,7 @@ function updateGame() {
             objectSpawnCooldown -= deltaTime;
         }
 
+        objects.sort((a, b) => a.z - b.z);
         for (let obj of objects) {
             obj.move(-obj.movingSpeed, 0, gameSpeed * deltaTime);
             if (obj.x < (0 - obj.width)) {
@@ -112,6 +114,12 @@ function updateGame() {
                     gameSpeed += Settings.currentOptions.speedAmplifier;
             }
             obj.draw();
+          
+            for (const otherObj of objects) {
+                if (obj.isTouching(otherObj))
+                    obj.collidesWithObject(otherObj);
+            }
+          
             if (player.isTouching(obj)) {
                 obj.collidesWithPlayer(player);
                 if (!player.isAlive()) {
