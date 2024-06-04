@@ -10,6 +10,7 @@ class GameComponent {
         this.movingSpeed = 3;
 
         this.collidesWithPlayer = (player) => {};
+        this.collidesWithObject = (otherObject) => {};
     }
 
     getGroundContactY() {

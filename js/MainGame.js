@@ -113,6 +113,11 @@ function updateGame() {
 
             obj.draw();
 
+            for (const otherObj of objects) {
+                if (obj.isTouching(otherObj))
+                    obj.collidesWithObject(otherObj);
+            }
+
             if (player.isTouching(obj)) {
                 obj.collidesWithPlayer(player);
                 if (!player.isAlive()) {
