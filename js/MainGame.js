@@ -33,6 +33,7 @@ function startGame() {
     resetGame();
 
     gameArea.start();
+    Settings.loadSettings();
     player = new PlayerComponent(Settings.currentOptions.playerSize, Settings.currentOptions.playerSize, "blue", 235, groundY - Settings.currentOptions.playerSize)
     ground = new GameComponent(960, 30, "green", 0, groundY)
 
