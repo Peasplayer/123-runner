@@ -27,7 +27,7 @@ class Settings {
             minObstacleSize: parseInt(document.getElementById("minObstacleSize").value),
             maxObstacleMultiplier: parseInt(document.getElementById("maxObstacleMultiplier").value),
             boost: parseFloat(document.getElementById("boost").value),
-            gravity: parseFloat(document.getElementById("gravity").value)
+            gravity: parseFloat(document.getElementById("gravity").value),
         }
 
         this.currentOptions = settingsObject;
