@@ -45,7 +45,7 @@ class GameComponent {
                 this.deltaY = 0;
                 this.y = this.getGroundContactY();
                 this.willJumpIn -= modifier;
-		console.log(this.willJumpIn);
+		//console.log(this.willJumpIn);
                 if(this.willJumpIn < 0)
                     this.deltaY = -(5);
             }else this.willJumpIn = 10;
