@@ -109,11 +109,14 @@ function updateGame() {
                 if (y < 0)
                     y = 0;
 
-                var newPowerUp = new PowerUpComponent(Settings.currentOptions.minObstacleSize, height, "black", 960, y);
+                var powerUpType = Math.floor(Math.random() * 2);
+                //console.log(powerUpType);
+                var newPowerUp = new PowerUpComponent(Settings.currentOptions.minObstacleSize, height, "black", 960, y, powerUpType);
                 newPowerUp.collidesWithPlayer = (Player) => {
-                    player.collectPowerUp();
+                    player.collectPowerUp(powerUpType);
                     objects.splice(objects.indexOf(newPowerUp), 1);
                 }
+                console.log;
                 objects.push(newPowerUp);
             }
             objectPowerUpSpawnCooldown = 100 / gameSpeed;
