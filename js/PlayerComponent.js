@@ -5,6 +5,34 @@ class PlayerComponent extends GameComponent {
         this.lives = 3;
     }
 
+    shootProjectile() {
+        let newProjectile = new GameComponent(10, 10, "green", this.x + this.width, this.y + this.height / 2);
+        newProjectile.movingSpeed = 5;
+        newProjectile.collidesWithObject = (otherObject) => {
+            this.projectiles = this.projectiles.filter(proj => proj !== newProjectile)
+            objects = objects.filter(obj => obj !== otherObject);
+        };
+        this.projectiles.push(newProjectile);
+    }
+
+    updateProjectiles() {
+        for (let i = 0; i < this.projectiles.length; i++) {
+            let proj = this.projectiles[i];
+            proj.x += proj.movingSpeed;
+            if (proj.x > gameArea.canvas.width) {
+                this.projectiles.splice(i, 1);
+                i--;
+            }
+        }
+    }
+
+    drawProjectiles() {
+        for (let proj of this.projectiles) {
+            proj.draw();
+        }
+    }
+
+
     accelerate(v) {
         this.velocity += v;
     }
