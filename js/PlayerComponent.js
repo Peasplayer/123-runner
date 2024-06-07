@@ -8,17 +8,17 @@ class PlayerComponent extends GameComponent {
     }
 
     shootProjectile() {
-    const currentTime = Date.now();
-    if (currentTime - this.lastShotTime < this.shootCooldown) {
-        let newProjectile = new GameComponent(10, 10, "green", this.x + this.width, this.y + this.height / 2);
-        newProjectile.movingSpeed = 5;
-        newProjectile.collidesWithObject = (otherObject) => {
-            this.projectiles = this.projectiles.filter(proj => proj !== newProjectile);
-            objects = objects.filter(obj => obj !== otherObject);
-        };
-    }
-        this.projectiles.push(newProjectile);
-        this.lastShotTime = currentTime;
+        const currentTime = Date.now();
+        if (currentTime - this.lastShotTime >= this.shootCooldown) {  
+            let newProjectile = new GameComponent(10, 10, "green", this.x + this.width, this.y + this.height / 2);  
+            newProjectile.movingSpeed = 5;  
+            newProjectile.collidesWithObject = (otherObject) => {  
+                this.projectiles = this.projectiles.filter(proj => proj !== newProjectile);
+                objects = objects.filter(obj => obj !== otherObject);  
+            }; 
+            this.projectiles.push(newProjectile);
+            this.lastShotTime = currentTime; 
+        }
     }
 
     updateProjectiles() {
