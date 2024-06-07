@@ -3,6 +3,7 @@ class PlayerComponent extends GameComponent {
         super(width, height, color, x, y);
         this.velocity = 0.0;
         this.lives = 3;
+        
         this.shootCooldown = 3000;
         this.lastShotTime = Date.now() - this.shootCooldown;
     }
