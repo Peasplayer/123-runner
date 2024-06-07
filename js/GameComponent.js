@@ -11,8 +11,6 @@ class GameComponent {
         this.projectiles = [];
         this.collidesWithPlayer = (player) => {};
         this.collidesWithObject = (otherObject) => {};
-        this.lastShotTime = 0;
-        this.shootCooldown = 3000;
     }
 
     getGroundContactY() {
