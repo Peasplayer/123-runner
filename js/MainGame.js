@@ -132,8 +132,8 @@ function updateGame() {
                 player.updateProjectiles();
 
                 for (let proj of player.projectiles) {
-                    for(obj of objects) {
-                        if (proj.isTouching(obj)) {
+                    for (let obj of objects) {
+                        if (proj.isTouching(obj)) { 
                             proj.collidesWithObject(obj);
                         }
                     }
