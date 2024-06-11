@@ -37,20 +37,16 @@ function startGame() {
     gameIsRunning = true;
 }
 
-function shootProjectile() {
-    if (player) {
-        player.shootProjectile();
-    }
-}
-
 var isKeyPressed = false;
 window.addEventListener('keydown', function (e) {
+    if (gameIsFrozen)
+        return;
     if (e.key == " ")
         isKeyPressed = true;
     if (e.key == "s")
         startGame();
-    if (e.key == "r") {
-        shootProjectile();
+    if (e.key == "r" && gameIsRunning) {
+        player.shootProjectile();
     }
 });
 
