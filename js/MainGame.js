@@ -16,12 +16,14 @@ const groundY = 450;
 
 function resetGame() {
     gameArea = new GameArea();
+
     objects = [];
     objectSpawnCooldown = 0;
     gameSpeed = 1.0;
     score = 0;
     lastUpdated = Date.now();
-    
+    floorIsLava = document.getElementById("FloorIsLava").value;
+
     if (Settings.currentOptions === undefined)
         Settings.currentOptions = Settings.defaultOptions;
 }
@@ -31,11 +33,11 @@ function startGame() {
         return false;
 
     resetGame();
-    floorIsLava = document.getElementById("FloorIsLava").value;
+
     gameArea.start();
     let playerSize = Settings.currentOptions.playerSize;
-    player = new PlayerComponent(playerSize, playerSize, "blue", 235,  (floorIsLava ? (groundY - playerSize) *  0.5 : groundY - playerSize));
-    ground = new GameComponent(960, 30, "green", 0, groundY)
+    player = new PlayerComponent(playerSize, playerSize, "blue", 235,  (floorIsLava ? (groundY - playerSize) *  0.5 : groundY - playerSize), 1);
+    ground = new GameComponent(960, 30, "green", 0, groundY, -1)
 
     gameProcess = setInterval(() => updateGame(), 1);
     gameIsRunning = true;
@@ -113,6 +115,11 @@ function updateGame() {
 
             obj.draw();
 
+            for (const otherObj of objects) {
+                if (obj.isTouching(otherObj))
+                    obj.collidesWithObject(otherObj);
+            }
+
             if (player.isTouching(obj)) {
                 obj.collidesWithPlayer(player);
                 if (!player.isAlive()) {
@@ -132,7 +139,7 @@ function updateGame() {
 
         if (player.y >= player.getGroundContactY() && floorIsLava == "true") {
             player.gotDamaged(1);
-            player.y = (groundY) / 4*3;
+            player.y = (groundY) / 4 *3;
         }
         if (player.y <= 0 && floorIsLava == "true") {
             player.gotDamaged(1);
