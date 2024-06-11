@@ -27,10 +27,15 @@ class Settings {
             minObstacleSize: parseInt(document.getElementById("minObstacleSize").value),
             maxObstacleMultiplier: parseInt(document.getElementById("maxObstacleMultiplier").value),
             boost: parseFloat(document.getElementById("boost").value),
-            gravity: parseFloat(document.getElementById("gravity").value),
+            gravity: parseFloat(document.getElementById("gravity").value)
         }
 
         this.currentOptions = settingsObject;
         document.cookie = "settings=" + JSON.stringify(settingsObject);
+    }
+    static loadSettings(){
+        let cookies = document.cookie.split(";");
+        let optionCookie = cookies?.find(cookie => cookie?.includes("settings="))?.replace("settings=", "");
+        this.currentOptions = optionCookie ? JSON.parse(optionCookie) : this.defaultOptions;
     }
 }
