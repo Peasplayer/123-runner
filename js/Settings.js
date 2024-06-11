@@ -33,4 +33,9 @@ class Settings {
         this.currentOptions = settingsObject;
         document.cookie = "settings=" + JSON.stringify(settingsObject);
     }
+    static loadSettings(){
+        let cookies = document.cookie.split(";");
+        let optionCookie = cookies?.find(cookie => cookie?.includes("settings="))?.replace("settings=", "");
+        this.currentOptions = optionCookie ? JSON.parse(optionCookie) : this.defaultOptions;
+    }
 }
