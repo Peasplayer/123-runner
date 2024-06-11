@@ -11,7 +11,8 @@ var gameSpeed = 1.0;
 var score = 0;
 var lastUpdated = 0;
 
-var floorIsLava;
+var floorIsLava = false;
+
 const groundY = 450;
 
 function resetGame() {
@@ -22,7 +23,7 @@ function resetGame() {
     gameSpeed = 1.0;
     score = 0;
     lastUpdated = Date.now();
-    floorIsLava = document.getElementById("FloorIsLava").value;
+    floorIsLava = document.getElementById("FloorIsLava").value === "true";
 
     Settings.loadSettings();
     if (Settings.currentOptions === undefined)
@@ -146,13 +147,27 @@ function updateGame() {
             player.accelerate(Settings.currentOptions.gravity * gameSpeed * deltaTime)
         }
 
-        if (player.y >= player.getGroundContactY() && floorIsLava == "true") {
+        if (player.y >= player.getGroundContactY() && floorIsLava) {
             player.gotDamaged(1);
-            player.y = (groundY) / 4 *3;
+
+            if (!player.isAlive()) {
+                player.color = "yellow";
+                clearInterval(gameProcess);
+                gameIsRunning = false;
+            }
+            else
+                player.y = (groundY) / 4 *3;
         }
-        if (player.y <= 0 && floorIsLava == "true") {
+        if (player.y <= 0 && floorIsLava) {
             player.gotDamaged(1);
-            player.y = (groundY) / 4;
+
+            if (!player.isAlive()) {
+                player.color = "yellow";
+                clearInterval(gameProcess);
+                gameIsRunning = false;
+            }
+            else
+                player.y = (groundY) / 4;
         }
 
         player.calcMove(deltaTime);
