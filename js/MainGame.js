@@ -11,6 +11,8 @@ var gameSpeed = 1.0;
 var score = 0;
 var lastUpdated = 0;
 
+var floorIsLava = false;
+
 const groundY = 450;
 
 function resetGame() {
@@ -21,6 +23,7 @@ function resetGame() {
     gameSpeed = 1.0;
     score = 0;
     lastUpdated = Date.now();
+    floorIsLava = document.getElementById("FloorIsLava").value === "true";
 
     Settings.loadSettings();
     if (Settings.currentOptions === undefined)
@@ -35,7 +38,8 @@ function startGame() {
 
     gameArea.start();
 
-    player = new PlayerComponent(Settings.currentOptions.playerSize, Settings.currentOptions.playerSize, "blue", 235, groundY - Settings.currentOptions.playerSize, 1)
+    let playerSize = Settings.currentOptions.playerSize;
+    player = new PlayerComponent(playerSize, playerSize, "blue", 235,  (floorIsLava ? (groundY - playerSize) *  0.5 : groundY - playerSize), 1);
     ground = new GameComponent(960, 30, "green", 0, groundY, -1)
 
     gameProcess = setInterval(() => updateGame(), 1);
@@ -105,7 +109,6 @@ function updateGame() {
         else
             objectSpawnCooldown -= deltaTime;
 
-        objects.sort((a, b) => a.z - b.z);
         for (let obj of objects) {
             obj.move(-obj.movingSpeed, 0, gameSpeed * deltaTime);
             if (obj.x < (0 - obj.width)) {
@@ -143,6 +146,30 @@ function updateGame() {
         else if (player.y < player.getGroundContactY()) {
             player.accelerate(Settings.currentOptions.gravity * gameSpeed * deltaTime)
         }
+
+        if (player.y >= player.getGroundContactY() && floorIsLava) {
+            player.gotDamaged(1);
+
+            if (!player.isAlive()) {
+                player.color = "yellow";
+                clearInterval(gameProcess);
+                gameIsRunning = false;
+            }
+            else
+                player.y = (groundY) / 4 *3;
+        }
+        if (player.y <= 0 && floorIsLava) {
+            player.gotDamaged(1);
+
+            if (!player.isAlive()) {
+                player.color = "yellow";
+                clearInterval(gameProcess);
+                gameIsRunning = false;
+            }
+            else
+                player.y = (groundY) / 4;
+        }
+
         player.calcMove(deltaTime);
     }
 

@@ -24,7 +24,7 @@ class PlayerComponent extends GameComponent {
     }
 
     isAlive() {
-        return player.lives > 0;
+        return this.lives > 0;
     }
 
     gotDamaged(livesTaken) {
