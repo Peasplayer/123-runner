@@ -7,8 +7,6 @@ class GameComponent {
         this.y = y;
 
         this.movingSpeed = 3;
-        this.deltaY = 0;
-        this.willFall = false;
 
         this.collidesWithPlayer = (player) => {};
     }
@@ -39,17 +37,6 @@ class GameComponent {
     move(x, y, modifier) {
         this.x += x * modifier;
         this.y += y * modifier;
-        if(this.willFall) {
-            this.deltaY += modifier * Settings.currentOptions.gravity * 0.25;
-                if(this.getGroundContactY() <= this.y){
-                this.deltaY = 0;
-                this.y = this.getGroundContactY();
-                this.willJumpIn -= modifier;
-		//console.log(this.willJumpIn);
-                if(this.willJumpIn < 0)
-                    this.deltaY = -(5);
-            }else this.willJumpIn = 10;
-	}
     }
     
     setPos(x, y) {

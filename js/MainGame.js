@@ -85,12 +85,14 @@ function updateGame() {
                 if (Math.random() < 0.25) { // add a slider?
                     newEnemy.movingSpeed = 5;
                     newEnemy.color = "purple";
-                }else if(Math.random() < 0.25){ // do something else?
+                }
+                else if (Math.random() < 0.25){ // do something else?
                     newEnemy.height = 50;
                     newEnemy.width = 50;
                     newEnemy.color = "lime";
-                    newEnemy.willFall = true;
-		}
+                    newEnemy.canJump = true;
+                    newEnemy.y = groundY / 2;
+		        }
                 newEnemy.collidesWithPlayer = (player) => {
                     player.gotDamaged(1);
                     objects = [];
@@ -103,7 +105,7 @@ function updateGame() {
             objectSpawnCooldown -= deltaTime;
 
         for (let obj of objects) {
-            obj.move(-obj.movingSpeed, obj.deltaY, gameSpeed * deltaTime);
+            obj.move(-obj.movingSpeed, 0, gameSpeed * deltaTime);
             if (obj.x < (0 - obj.width)) {
                 objects.splice(objects.indexOf(obj), 1);
                 continue;
