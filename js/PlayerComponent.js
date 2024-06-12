@@ -79,10 +79,4 @@ class PlayerComponent extends GameComponent {
             counter++;
         }, 500);
     }
-    drawLives() {
-        let ctx = GameArea.context;
-        ctx.fillStyle = "black";
-        ctx.font = "20px Arial";
-        ctx.fillText("Leben: " + this.lives, 10, 30);
-        }
 }
