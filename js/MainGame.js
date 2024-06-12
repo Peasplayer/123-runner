@@ -33,7 +33,7 @@ function startGame() {
     player = new PlayerComponent(Settings.currentOptions.playerSize, Settings.currentOptions.playerSize, "blue", 235, groundY - Settings.currentOptions.playerSize, 1)
     ground = new GameComponent(960, 30, "green", 0, groundY, -1)
 
-    gameProcess = setInterval(() => updateGame(), 16,7);
+    gameProcess = setInterval(() => updateGame(), 1);
     gameIsRunning = true;
 }
 
