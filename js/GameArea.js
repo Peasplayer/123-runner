@@ -13,10 +13,4 @@ class GameArea {
     clear() {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
-    drawLives() {
-    let ctx = GameArea.context;
-    ctx.fillStyle = "black";
-    ctx.font = "20px Arial";
-    ctx.fillText("Leben: " + this.lives, 10, 30);
-    }
 }

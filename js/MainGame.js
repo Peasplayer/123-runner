@@ -148,6 +148,8 @@ function updateGame() {
     }
 
     player.draw();
+
+    
     player.drawLives();
 
     document.getElementById("score").textContent = "Score: " + score;
