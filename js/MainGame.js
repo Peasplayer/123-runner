@@ -148,6 +148,7 @@ function updateGame() {
     }
 
     player.draw();
+    player.drawLives();
 
     document.getElementById("score").textContent = "Score: " + score;
     document.getElementById("speed").textContent = "Speed: " + (Math.round(gameSpeed * 100) / 100).toFixed(2);
