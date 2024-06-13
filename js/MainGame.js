@@ -131,7 +131,7 @@ function updateGame() {
                 if (y < 0)
                     y = 0;
 
-                var powerUpType = Math.floor(Math.random() * 3);
+                var powerUpType = Math.floor(Math.random() * 4);
                 var newPowerUp = new PowerUpComponent(Settings.currentOptions.minObstacleSize, height, "black", 960, y, powerUpType);
                 newPowerUp.collidesWithPlayer = (player) => {
                     player.collectPowerUp(powerUpType);

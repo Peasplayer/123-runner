@@ -3,5 +3,5 @@ class PowerUpComponent extends GameComponent{
         super(width, height,color, x, y)
 
         this.powerUpType = powerUpType;
-    }  
+    }
 }

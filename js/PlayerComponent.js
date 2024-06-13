@@ -5,7 +5,7 @@ class PlayerComponent extends GameComponent {
         this.velocity = 0.0;
         this.lives = 3;
         this.invincible = false;
-        this.schild = true;
+        this.schild = false;
     }
 
     accelerate(v) {
@@ -115,8 +115,43 @@ class PlayerComponent extends GameComponent {
 
                     counter++;
                     }, 200);
+
                     this.schild = true
-                    break;                                  
+                    break;
+            case 3:
+                    var counter = 10;
+                    //Blinkt, solange counter und conterinvincible >= 0 ist.
+                    var blinkAnimation = setInterval(() => {
+                    if (counter && counterInvincible <= 0) {
+                        clearInterval(blinkAnimation);
+                        this.color = "blue";
+                        console.log("fertig")
+                        this.invincible = false;                        
+                    gameIsFrozen = false;
+                    return;
+                    }
+    
+                    if (counter % 2 === 0){
+                    this.color = "red";
+                    }
+                    else {
+                    this.color = "blue";
+                    }
+
+                    counter--;
+                    }, 35 * counter);
+
+                    this.invincible = true;
+
+                    //Zählt 5 Sekunden. Spielt eine Rolle für das Blinken.
+                    var counterInvincible = 5;
+                    var invincibleCooldown = setInterval(() => {
+                        if(counterInvincible <= 0) {
+                            clearInterval(invincibleCooldown)
+                        }
+                        counterInvincible--;
+                    }, 1000)
+                    break;           
         }
         
     }
