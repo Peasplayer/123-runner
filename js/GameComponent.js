@@ -1,14 +1,16 @@
 class GameComponent {
-    constructor(width, height, color, x, y) {
+    constructor(width, height, color, x, y, z) {
         this.width = width;
         this.height = height;
         this.color = color;
         this.x = x;
         this.y = y;
+        this.z = z ?? 0;
 
         this.movingSpeed = 3;
 
         this.collidesWithPlayer = (player) => {};
+        this.collidesWithObject = (otherObject) => {};
     }
 
     getGroundContactY() {
