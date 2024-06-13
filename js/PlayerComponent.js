@@ -97,6 +97,26 @@ class PlayerComponent extends GameComponent {
                     gameSpeed /= 2;
                     const myTimeout = setTimeout(this.speedCooldown, 2000)
                 break;
+            case 2:
+                    var counter = 0;
+                    var blinkAnimation = setInterval(() => {
+                    if (counter >= 4) {
+                        clearInterval(blinkAnimation);
+                    gameIsFrozen = false;
+                    return;
+                    }
+    
+                    if (counter % 2 === 0){
+                    this.color = "cyan";
+                    }
+                    else {
+                    this.color = "blue";
+                    }
+
+                    counter++;
+                    }, 200);
+                    this.schild = true
+                    break;                                  
         }
         
     }
