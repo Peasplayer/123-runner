@@ -101,8 +101,17 @@ function updateGame() {
                     newEnemy.y = groundY / 2;
 		        }
                 newEnemy.collidesWithPlayer = (player) => {
-                    player.gotDamaged(1);
-                    objects = [];
+                    if(player.invincible == false) {
+                        if(player.schild == false) {
+                            player.gotDamaged(1);
+                            objects = [];
+                        }
+                        else {
+                            objects = [];
+                            player.schild = false;
+                        }                        
+                    }
+                    
                 };
                 objects.push(newEnemy);
             }
@@ -123,13 +132,11 @@ function updateGame() {
                     y = 0;
 
                 var powerUpType = Math.floor(Math.random() * 2);
-                //console.log(powerUpType);
                 var newPowerUp = new PowerUpComponent(Settings.currentOptions.minObstacleSize, height, "black", 960, y, powerUpType);
-                newPowerUp.collidesWithPlayer = (Player) => {
+                newPowerUp.collidesWithPlayer = (player) => {
                     player.collectPowerUp(powerUpType);
                     objects.splice(objects.indexOf(newPowerUp), 1);
-                }
-                console.log;
+                }               
                 objects.push(newPowerUp);
             }
             objectPowerUpSpawnCooldown = 100 / gameSpeed;
@@ -209,7 +216,6 @@ function updateGame() {
     // reset for dt
     lastUpdated = now;
 }
-
 class Point {
     constructor(x, y) {
         this.x = x;

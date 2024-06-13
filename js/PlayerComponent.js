@@ -4,6 +4,8 @@ class PlayerComponent extends GameComponent {
 
         this.velocity = 0.0;
         this.lives = 3;
+        this.invincible = false;
+        this.schild = true;
     }
 
     accelerate(v) {
@@ -50,7 +52,6 @@ class PlayerComponent extends GameComponent {
         }, 500);
     }
     collectPowerUp(powerUpType){
-        console.log(powerUpType);
         switch(powerUpType){
             
             case 0:
@@ -92,10 +93,14 @@ class PlayerComponent extends GameComponent {
 
                     counter++;
                     }, 200);
-
+                                       
                     gameSpeed /= 2;
+                    const myTimeout = setTimeout(this.speedCooldown, 2000)
                 break;
         }
         
+    }
+    speedCooldown() {
+        gameSpeed *= 2
     }
 }
