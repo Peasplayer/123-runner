@@ -4,10 +4,13 @@ class PlayerComponent extends GameComponent {
 
         this.velocity = 0.0;
         this.lives = 3;
+
+        this.isAnimating = false;
     }
 
     accelerate(v) {
-        this.velocity += v;
+        if (!this.isAnimating)
+            this.velocity += v;
     }
 
     calcMove(dt) {
@@ -19,7 +22,7 @@ class PlayerComponent extends GameComponent {
             this.y = 0;
             this.velocity = 0;
         }
-        else
+        else if (!this.isAnimating)
             this.y += this.velocity * dt;
     }
 

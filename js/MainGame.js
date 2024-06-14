@@ -11,6 +11,12 @@ var gameSpeed = 1.0;
 var score = 0;
 var lastUpdated = 0;
 
+var ebene = 1;
+var canSpawnObstacles = true;
+var portal;
+var portalActive = false;
+var blackscreenActive = false;
+
 var floorIsLava = false;
 
 const groundY = 450;
@@ -22,6 +28,7 @@ function resetGame() {
     objectSpawnCooldown = 0;
     gameSpeed = 1.0;
     score = 0;
+    ebene = 1;
     lastUpdated = Date.now();
     floorIsLava = document.getElementById("FloorIsLava").value === "true";
 
@@ -41,6 +48,7 @@ function startGame() {
     let playerSize = Settings.currentOptions.playerSize;
     player = new PlayerComponent(playerSize, playerSize, "blue", 235,  (floorIsLava ? (groundY - playerSize) *  0.5 : groundY - playerSize), 1);
     ground = new GameComponent(960, 30, "green", 0, groundY, -1)
+    portal = new GameComponent(100, 200, "yellow", 465, 190);
 
     gameProcess = setInterval(() => updateGame(), 1);
     gameIsRunning = true;
@@ -69,11 +77,20 @@ function updateGame() {
     gameArea.clear();
     ground.draw();
 
+    if (portalActive){
+        portal.draw();
+    }
+    if (blackscreenActive) {
+        var blackoutOverlay = new GameComponent(gameArea.canvas.width, gameArea.canvas.height, "black", 0, 0);
+        blackoutOverlay.overlayColor = "rgba(0, 0, 0, 0.8)";
+        blackoutOverlay.draw();
+    }
+
     if (!gameIsFrozen) {
         if (Settings.currentOptions.speedAmplifyingEvent === "frame")
             gameSpeed += Settings.currentOptions.speedAmplifier * deltaTime;
 
-        if (objectSpawnCooldown <= 0) {
+        if (objectSpawnCooldown <= 0 && canSpawnObstacles) {
             var chance = Math.random() * 100 + 1;
             if (chance <= Settings.currentOptions.difficulty) {
                 var size = Math.random() * Settings.currentOptions.maxObstacleMultiplier * Settings.currentOptions.minObstacleSize + Settings.currentOptions.minObstacleSize;
@@ -118,6 +135,7 @@ function updateGame() {
 
             if (obj.x < (player.x - obj.width) && !obj.gavePoint) {
                 score++;
+                ebenenWechsel();
                 obj.gavePoint = true;
                 if (Settings.currentOptions.speedAmplifyingEvent === "score")
                     gameSpeed += Settings.currentOptions.speedAmplifier;
@@ -130,7 +148,7 @@ function updateGame() {
                     obj.collidesWithObject(otherObj);
             }
 
-            if (player.isTouching(obj)) {
+            if (player.isTouching(obj) && canSpawnObstacles) {
                 obj.collidesWithPlayer(player);
                 if (!player.isAlive()) {
                     player.color = "yellow";
@@ -177,11 +195,61 @@ function updateGame() {
 
     document.getElementById("score").textContent = "Score: " + score;
     document.getElementById("speed").textContent = "Speed: " + (Math.round(gameSpeed * 100) / 100).toFixed(2);
+    document.getElementById("ebene").textContent = "Ebene: " + ebene;
 
     // reset for dt
     lastUpdated = now;
 }
 
+function ebenenWechsel(){
+    if (score % 30 == 0){
+        canSpawnObstacles = false;
+        portalActive = true;
+        for (let obj of objects){
+            obj.gavePoint = true;
+            if (obj.x < (0 - obj.width)){
+                objects.splice(objects.indexOf(obj), 1);
+            }
+        }
+        if (objects.length > 0){
+            goToPortal();
+        } 
+        if (Settings.currentOptions.speedAmplifyingEvent === "ebene"){
+            gameSpeed += Settings.currentOptions.speedAmplifier * 10; 
+        }
+    }
+}
+function goToPortal() {
+    player.isAnimating = true;
+
+    const centerX = 480;
+    const centerY = 270;
+
+    const velocityX = (centerX - player.x) / 250;
+    const velocityY = (centerY - player.y) / 250; 
+
+    const moveAnimation = setInterval(() => {
+        player.move(velocityX, velocityY, 1);
+    
+        if (Math.abs(player.x - centerX) <= 1 && Math.abs(player.y - centerY) <= 1) {
+            clearInterval(moveAnimation);
+            setTimeout(() => {
+                player.setPos(235, groundY - player.height);
+                player.isAnimating = false;
+                canSpawnObstacles = true;
+                ebene++;
+                portalActive = false;
+                showBlackscreen();
+            }, 2000);
+        }
+    }, 10);
+}
+function showBlackscreen(){
+        blackscreenActive = true;
+        setTimeout(() => {
+            blackscreenActive = false;
+        }, 50)
+}
 class Point {
     constructor(x, y) {
         this.x = x;
