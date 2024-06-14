@@ -202,7 +202,7 @@ function updateGame() {
 }
 
 function ebenenWechsel(){
-    if (score % 30 == 0){
+    if (score % 2 == 0){
         canSpawnObstacles = false;
         portalActive = true;
         for (let obj of objects){
@@ -239,16 +239,13 @@ function goToPortal() {
                 canSpawnObstacles = true;
                 ebene++;
                 portalActive = false;
-                showBlackscreen();
+                blackscreenActive = true;
+                setTimeout(() => {
+                    blackscreenActive = false;
+                }, 50)
             }, 2000);
         }
     }, 10);
-}
-function showBlackscreen(){
-        blackscreenActive = true;
-        setTimeout(() => {
-            blackscreenActive = false;
-        }, 50)
 }
 class Point {
     constructor(x, y) {
