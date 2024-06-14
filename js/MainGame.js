@@ -202,7 +202,7 @@ function updateGame() {
 }
 
 function ebenenWechsel(){
-    if (score % 2 == 0){
+    if (score % 30 == 0){
         canSpawnObstacles = false;
         portalActive = true;
         for (let obj of objects){
@@ -211,7 +211,7 @@ function ebenenWechsel(){
                 objects.splice(objects.indexOf(obj), 1);
             }
         }
-        goToPortal(); 
+         goToPortal(); 
         if (Settings.currentOptions.speedAmplifyingEvent === "ebene"){
             gameSpeed += Settings.currentOptions.speedAmplifier * 10; 
         }
