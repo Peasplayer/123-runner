@@ -211,9 +211,7 @@ function ebenenWechsel(){
                 objects.splice(objects.indexOf(obj), 1);
             }
         }
-        if (objects.length > 0){
-            goToPortal();
-        } 
+        goToPortal(); 
         if (Settings.currentOptions.speedAmplifyingEvent === "ebene"){
             gameSpeed += Settings.currentOptions.speedAmplifier * 10; 
         }
