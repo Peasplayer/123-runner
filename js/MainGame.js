@@ -10,16 +10,21 @@ var gameSpeed = 1.0;
 var score = 0;
 var lastUpdated = 0;
 
+var floorIsLava = false;
+
 const groundY = 450;
 
 function resetGame() {
     gameArea = new GameArea();
+
     objects = [];
     objectSpawnCooldown = 0;
     gameSpeed = 1.0;
     score = 0;
     lastUpdated = Date.now();
+    floorIsLava = document.getElementById("floorIsLava").value === "true";
 
+    Settings.loadSettings();
     if (Settings.currentOptions === undefined)
         Settings.currentOptions = Settings.defaultOptions;
 }
@@ -29,22 +34,33 @@ function startGame() {
         return false;
 
     resetGame();
+
+    document.getElementById("floorIsLava").disabled = true;
+
     gameArea.start();
-    player = new PlayerComponent(Settings.currentOptions.playerSize, Settings.currentOptions.playerSize, "blue", 235, groundY - Settings.currentOptions.playerSize, 1)
+
+    let playerSize = Settings.currentOptions.playerSize;
+    player = new PlayerComponent(playerSize, playerSize, "blue", 235,  (floorIsLava ? (groundY - playerSize) *  0.5 : groundY - playerSize), 1);
     ground = new GameComponent(960, 30, "green", 0, groundY, -1)
 
     gameProcess = setInterval(() => updateGame(), 1);
     gameIsRunning = true;
 }
 
+function stopGame() {
+    document.getElementById("floorIsLava").disabled = false;
+    clearInterval(gameProcess);
+    gameIsRunning = false;
+}
+
 var isKeyPressed = false;
 window.addEventListener('keydown', function (e) {
+    if (e.key == "s")
+        startGame();
     if (gameIsFrozen)
         return;
     if (e.key == " ")
         isKeyPressed = true;
-    if (e.key == "s")
-        startGame();
     if (e.key == "r" && gameIsRunning) {
         player.shootProjectile();
     }
@@ -80,11 +96,19 @@ function updateGame() {
                     y = groundY - height;
                 if (y < 0)
                     y = 0;
+
                 var newEnemy = new EnemyComponent(xOrY ? size : Settings.currentOptions.minObstacleSize, height, "red", 960, y);
-                if (Math.random() < 0.33) {
+                if (Math.random() < 0.25) { // add a slider?
                     newEnemy.movingSpeed = 5;
                     newEnemy.color = "purple";
                 }
+                else if (Math.random() < 0.25){ // do something else?
+                    newEnemy.height = 50;
+                    newEnemy.width = 50;
+                    newEnemy.color = "lime";
+                    newEnemy.canJump = true;
+                    newEnemy.y = groundY / 2;
+		        }
                 newEnemy.collidesWithPlayer = (player) => {
                     player.gotDamaged(1);
                     objects = [];
@@ -92,9 +116,9 @@ function updateGame() {
                 objects.push(newEnemy);
             }
             objectSpawnCooldown = 50 / gameSpeed;
-        } else {
-            objectSpawnCooldown -= deltaTime;
         }
+        else
+            objectSpawnCooldown -= deltaTime;
 
         objects.sort((a, b) => a.z - b.z);
         for (let obj of objects) {
@@ -103,45 +127,56 @@ function updateGame() {
                 objects.splice(objects.indexOf(obj), 1);
                 continue;
             }
+
             if (obj.x < (player.x - obj.width) && !obj.gavePoint) {
                 score++;
                 obj.gavePoint = true;
                 if (Settings.currentOptions.speedAmplifyingEvent === "score")
                     gameSpeed += Settings.currentOptions.speedAmplifier;
             }
+
             obj.draw();
-          
+
             for (const otherObj of objects) {
                 if (obj.isTouching(otherObj))
                     obj.collidesWithObject(otherObj);
             }
-          
+
             if (player.isTouching(obj)) {
                 obj.collidesWithPlayer(player);
-                if (!player.isAlive()) {
-                    player.color = "yellow";
-                    clearInterval(gameProcess);
-                    gameIsRunning = false;
-                }
             }
 
-                player.updateProjectiles();
+            player.updateProjectiles();
 
-                for (let proj of player.projectiles) {
-                    for (let obj of objects) {
-                        if (proj.isTouching(obj)) { 
-                            proj.collidesWithObject(obj);
-                        }
+            for (let proj of player.projectiles) {
+                for (let obj of objects) {
+                    if (proj.isTouching(obj)) {
+                        proj.collidesWithObject(obj);
                     }
                 }
-
+            }
         }
 
         if (isKeyPressed) {
             player.accelerate(-Settings.currentOptions.boost * gameSpeed * deltaTime);
-        } else if (player.y < player.getGroundContactY()) {
-            player.accelerate(Settings.currentOptions.gravity * gameSpeed * deltaTime);
         }
+        else if (player.y < player.getGroundContactY()) {
+            player.accelerate(Settings.currentOptions.gravity * gameSpeed * deltaTime)
+        }
+
+        if (player.y >= player.getGroundContactY() && floorIsLava) {
+            player.gotDamaged(1);
+
+            if (player.isAlive())
+                player.y = (groundY) / 4 *3;
+        }
+        if (player.y <= 0 && floorIsLava) {
+            player.gotDamaged(1);
+
+            if (player.isAlive())
+                player.y = (groundY) / 4;
+        }
+
         player.calcMove(deltaTime);
         player.updateProjectiles();
         player.drawProjectiles();

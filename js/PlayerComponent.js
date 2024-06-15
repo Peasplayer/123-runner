@@ -1,24 +1,25 @@
 class PlayerComponent extends GameComponent {
     constructor(width, height, color, x, y) {
         super(width, height, color, x, y);
+
         this.velocity = 0.0;
         this.lives = 3;
-        
+
         this.shootCooldown = 3000;
         this.lastShotTime = Date.now() - this.shootCooldown;
     }
 
     shootProjectile() {
-        const currentTime = Date.now();
-        if (currentTime - this.lastShotTime >= this.shootCooldown) {  
-            let newProjectile = new GameComponent(10, 10, "green", this.x + this.width, this.y + this.height / 2);  
-            newProjectile.movingSpeed = 3;  
-            newProjectile.collidesWithObject = (otherObject) => {  
+        var currentTime = Date.now();
+        if (currentTime - this.lastShotTime >= this.shootCooldown) {
+            let newProjectile = new GameComponent(10, 10, "green", this.x + this.width, this.y + this.height / 2);
+            newProjectile.movingSpeed = 3;
+            newProjectile.collidesWithObject = (otherObject) => {
                 this.projectiles = this.projectiles.filter(proj => proj !== newProjectile);
-                objects = objects.filter(obj => obj !== otherObject);  
-         }; 
+                objects = objects.filter(obj => obj !== otherObject);
+         };
             this.projectiles.push(newProjectile);
-            this.lastShotTime = currentTime; 
+            this.lastShotTime = currentTime;
         }
     }
 
@@ -48,12 +49,13 @@ class PlayerComponent extends GameComponent {
         if (this.y + this.velocity > this.getGroundContactY()) {
             this.y = this.getGroundContactY();
             this.velocity = 0;
-        } else if (this.y + this.velocity < 0) {
+        }
+        else if (this.y + this.velocity < 0){
             this.y = 0;
             this.velocity = 0;
-        } else {
-            this.y += this.velocity * dt;
         }
+        else
+            this.y += this.velocity * dt;
     }
 
     isAlive() {
@@ -61,9 +63,16 @@ class PlayerComponent extends GameComponent {
     }
 
     gotDamaged(livesTaken) {
-        gameIsFrozen = true;
         this.lives -= livesTaken;
+
+        if (!this.isAlive()) {
+            this.die();
+            return;
+        }
+
+        gameIsFrozen = true;
         this.lastShotTime = Date.now() - this.shootCooldown;
+
         var counter = 0;
         var blinkAnimation = setInterval(() => {
             if (counter >= 6) {
@@ -71,15 +80,24 @@ class PlayerComponent extends GameComponent {
                 gameIsFrozen = false;
                 return;
             }
+
             if (counter % 2 === 0) {
                 this.color = "orange";
-            } else {
+            }
+            else {
                 this.color = "blue";
             }
+
             counter++;
         }, 500);
     }
-    drawLives() { 
+
+    die() {
+        player.color = "yellow";
+        stopGame();
+    }
+
+    drawLives() {
         let ctx = gameArea.context;
         for(let i = 0; i < this.lives; i++) {
             ctx.fillStyle = "red";
