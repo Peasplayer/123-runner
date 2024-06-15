@@ -99,7 +99,7 @@ function updateGame() {
 
                 var newEnemy = new EnemyComponent(xOrY ? size : Settings.currentOptions.minObstacleSize, height, "red", 960, y);
                 if (Math.random() < 0.25) { // add a slider?
-                    newEnemy.movingSpeed = 5;
+                    newEnemy.movingSpeed = -5;
                     newEnemy.color = "purple";
                 }
                 else if (Math.random() < 0.25){ // do something else?
@@ -122,7 +122,7 @@ function updateGame() {
 
         objects.sort((a, b) => a.z - b.z);
         for (let obj of objects) {
-            obj.move(-obj.movingSpeed, 0, gameSpeed * deltaTime);
+            obj.move(obj.movingSpeed, 0, gameSpeed * deltaTime);
             if (obj.x < (0 - obj.width)) {
                 objects.splice(objects.indexOf(obj), 1);
                 continue;
@@ -137,23 +137,13 @@ function updateGame() {
 
             obj.draw();
 
-            for (const otherObj of objects) {
-                if (obj.isTouching(otherObj))
+            for (let otherObj of objects) {
+                if (obj !== otherObj && obj.isTouching(otherObj))
                     obj.collidesWithObject(otherObj);
             }
 
             if (player.isTouching(obj)) {
                 obj.collidesWithPlayer(player);
-            }
-
-            player.updateProjectiles();
-
-            for (let proj of player.projectiles) {
-                for (let obj of objects) {
-                    if (proj.isTouching(obj)) {
-                        proj.collidesWithObject(obj);
-                    }
-                }
             }
         }
 
@@ -178,8 +168,6 @@ function updateGame() {
         }
 
         player.calcMove(deltaTime);
-        player.updateProjectiles();
-        player.drawProjectiles();
     }
 
     player.draw();
@@ -187,6 +175,8 @@ function updateGame() {
 
     document.getElementById("score").textContent = "Score: " + score;
     document.getElementById("speed").textContent = "Speed: " + (Math.round(gameSpeed * 100) / 100).toFixed(2);
+    var shootCooldown = Settings.currentOptions.shootCooldown * 1000 - (Date.now() - player.lastShotTime);
+    document.getElementById("shootCooldown").textContent = "Shoot-Cooldown: " + (shootCooldown < 0 ? 0.0 : (shootCooldown / 1000).toFixed(1));
 
     // reset for dt
     lastUpdated = now;

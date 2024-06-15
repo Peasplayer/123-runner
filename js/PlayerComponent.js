@@ -5,41 +5,21 @@ class PlayerComponent extends GameComponent {
         this.velocity = 0.0;
         this.lives = 3;
 
-        this.shootCooldown = 3000;
-        this.lastShotTime = Date.now() - this.shootCooldown;
+        this.lastShotTime = 0;
     }
 
     shootProjectile() {
         var currentTime = Date.now();
-        if (currentTime - this.lastShotTime >= this.shootCooldown) {
+        if (currentTime - this.lastShotTime >= Settings.currentOptions.shootCooldown * 1000) {
             let newProjectile = new GameComponent(10, 10, "green", this.x + this.width, this.y + this.height / 2);
             newProjectile.movingSpeed = 3;
             newProjectile.collidesWithObject = (otherObject) => {
-                this.projectiles = this.projectiles.filter(proj => proj !== newProjectile);
-                objects = objects.filter(obj => obj !== otherObject);
-         };
-            this.projectiles.push(newProjectile);
+                objects = objects.filter(obj => obj !== otherObject && obj !== newProjectile);
+            };
+            objects.push(newProjectile);
             this.lastShotTime = currentTime;
         }
     }
-
-    updateProjectiles() {
-        for (let i = 0; i < this.projectiles.length; i++) {
-            let proj = this.projectiles[i];
-            proj.x += proj.movingSpeed;
-            if (proj.x > gameArea.canvas.width) {
-                this.projectiles.splice(i, 1);
-                i--;
-            }
-        }
-    }
-
-    drawProjectiles() {
-        for (let proj of this.projectiles) {
-            proj.draw();
-        }
-    }
-
 
     accelerate(v) {
         this.velocity += v;
@@ -71,7 +51,7 @@ class PlayerComponent extends GameComponent {
         }
 
         gameIsFrozen = true;
-        this.lastShotTime = Date.now() - this.shootCooldown;
+        this.lastShotTime = Date.now() - Settings.currentOptions.shootCooldown * 1000;
 
         var counter = 0;
         var blinkAnimation = setInterval(() => {
