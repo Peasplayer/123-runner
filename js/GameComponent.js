@@ -7,8 +7,7 @@ class GameComponent {
         this.y = y;
         this.z = z ?? 0;
 
-        this.movingSpeed = 3;
-
+        this.movingSpeed = -3;
         this.collidesWithPlayer = (player) => {};
         this.collidesWithObject = (otherObject) => {};
     }
@@ -25,16 +24,14 @@ class GameComponent {
         var pointB2 = new Point(comp.x + comp.width, comp.y + comp.height);
 
         if (pointA1.x > pointB2.x || pointB1.x > pointA2.x)
-            return false;
+           return false;
 
         if (pointA1.y > pointB2.y || pointB1.y > pointA2.y)
             return false;
 
-        /*if (minX <= comp.x && maxX >= comp.x && minY <= comp.y && maxY >= comp.y)
-            return true;*/
-
         return true;
     }
+    
 
     move(x, y, modifier) {
         this.x += x * modifier;

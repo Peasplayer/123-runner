@@ -2,7 +2,6 @@ var gameArea;
 var player;
 var ground;
 var objects = [];
-
 var gameIsRunning = false;
 var gameIsFrozen = false;
 var gameProcess;
@@ -56,20 +55,25 @@ function stopGame() {
 
 var isKeyPressed = false;
 window.addEventListener('keydown', function (e) {
-    if (e.key == " ")
-        isKeyPressed = true;
     if (e.key == "s")
         startGame();
-})
+    if (gameIsFrozen)
+        return;
+    if (e.key == " ")
+        isKeyPressed = true;
+    if (e.key == "r" && gameIsRunning) {
+        player.shootProjectile();
+    }
+});
+
 window.addEventListener('keyup', function (e) {
     if (e.key == " ")
         isKeyPressed = false;
-})
+});
 
 function updateGame() {
     var now = Date.now();
-    var deltaTime = (now - lastUpdated) / 10.0; // delta time in centi seconds
-    // after dt
+    var deltaTime = (now - lastUpdated) / 10.0;
 
     if (!gameIsRunning)
         return;
@@ -88,15 +92,14 @@ function updateGame() {
                 var xOrY = Math.random() * 2 <= 1;
                 var height = xOrY ? Settings.currentOptions.minObstacleSize : size;
                 var y = Math.random() * (groundY + 1) - height / 2;
-                if (y + height  > groundY)
+                if (y + height > groundY)
                     y = groundY - height;
-
                 if (y < 0)
                     y = 0;
 
                 var newEnemy = new EnemyComponent(xOrY ? size : Settings.currentOptions.minObstacleSize, height, "red", 960, y);
                 if (Math.random() < 0.25) { // add a slider?
-                    newEnemy.movingSpeed = 5;
+                    newEnemy.movingSpeed = -5;
                     newEnemy.color = "purple";
                 }
                 else if (Math.random() < 0.25){ // do something else?
@@ -117,8 +120,9 @@ function updateGame() {
         else
             objectSpawnCooldown -= deltaTime;
 
+        objects.sort((a, b) => a.z - b.z);
         for (let obj of objects) {
-            obj.move(-obj.movingSpeed, 0, gameSpeed * deltaTime);
+            obj.move(obj.movingSpeed, 0, gameSpeed * deltaTime);
             if (obj.x < (0 - obj.width)) {
                 objects.splice(objects.indexOf(obj), 1);
                 continue;
@@ -133,8 +137,8 @@ function updateGame() {
 
             obj.draw();
 
-            for (const otherObj of objects) {
-                if (obj.isTouching(otherObj))
+            for (let otherObj of objects) {
+                if (obj !== otherObj && obj.isTouching(otherObj))
                     obj.collidesWithObject(otherObj);
             }
 
@@ -167,9 +171,12 @@ function updateGame() {
     }
 
     player.draw();
+    player.drawLives();
 
     document.getElementById("score").textContent = "Score: " + score;
     document.getElementById("speed").textContent = "Speed: " + (Math.round(gameSpeed * 100) / 100).toFixed(2);
+    var shootCooldown = Settings.currentOptions.shootCooldown * 1000 - (Date.now() - player.lastShotTime);
+    document.getElementById("shootCooldown").textContent = "Shoot-Cooldown: " + (shootCooldown < 0 ? 0.0 : (shootCooldown / 1000).toFixed(1));
 
     // reset for dt
     lastUpdated = now;
