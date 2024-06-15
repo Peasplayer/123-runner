@@ -25,6 +25,7 @@ function resetGame() {
     lastUpdated = Date.now();
     floorIsLava = document.getElementById("floorIsLava").value === "true";
 
+    Settings.loadSettings();
     if (Settings.currentOptions === undefined)
         Settings.currentOptions = Settings.defaultOptions;
 }
@@ -116,7 +117,6 @@ function updateGame() {
         else
             objectSpawnCooldown -= deltaTime;
 
-        objects.sort((a, b) => a.z - b.z);
         for (let obj of objects) {
             obj.move(-obj.movingSpeed, 0, gameSpeed * deltaTime);
             if (obj.x < (0 - obj.width)) {
