@@ -28,9 +28,14 @@ class PlayerComponent extends GameComponent {
     }
 
     gotDamaged(livesTaken) {
-        gameIsFrozen = true;
         this.lives -= livesTaken;
 
+        if (!this.isAlive()) {
+            this.die();
+            return;
+        }
+
+        gameIsFrozen = true;
         var counter = 0;
         var blinkAnimation = setInterval(() => {
             if (counter >= 6) {
@@ -48,5 +53,10 @@ class PlayerComponent extends GameComponent {
 
             counter++;
         }, 500);
+    }
+
+    die() {
+        player.color = "yellow";
+        stopGame();
     }
 }

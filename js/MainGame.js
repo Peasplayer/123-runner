@@ -11,6 +11,8 @@ var gameSpeed = 1.0;
 var score = 0;
 var lastUpdated = 0;
 
+var floorIsLava = false;
+
 const groundY = 450;
 
 function resetGame() {
@@ -21,6 +23,7 @@ function resetGame() {
     gameSpeed = 1.0;
     score = 0;
     lastUpdated = Date.now();
+    floorIsLava = document.getElementById("floorIsLava").value === "true";
 
     if (Settings.currentOptions === undefined)
         Settings.currentOptions = Settings.defaultOptions;
@@ -32,12 +35,22 @@ function startGame() {
 
     resetGame();
 
+    document.getElementById("floorIsLava").disabled = true;
+
     gameArea.start();
-    player = new PlayerComponent(Settings.currentOptions.playerSize, Settings.currentOptions.playerSize, "blue", 235, groundY - Settings.currentOptions.playerSize, 1)
+
+    let playerSize = Settings.currentOptions.playerSize;
+    player = new PlayerComponent(playerSize, playerSize, "blue", 235,  (floorIsLava ? (groundY - playerSize) *  0.5 : groundY - playerSize), 1);
     ground = new GameComponent(960, 30, "green", 0, groundY, -1)
 
     gameProcess = setInterval(() => updateGame(), 1);
     gameIsRunning = true;
+}
+
+function stopGame() {
+    document.getElementById("floorIsLava").disabled = false;
+    clearInterval(gameProcess);
+    gameIsRunning = false;
 }
 
 var isKeyPressed = false;
@@ -81,10 +94,17 @@ function updateGame() {
                     y = 0;
 
                 var newEnemy = new EnemyComponent(xOrY ? size : Settings.currentOptions.minObstacleSize, height, "red", 960, y);
-                if (Math.random() < 0.33) {
+                if (Math.random() < 0.25) { // add a slider?
                     newEnemy.movingSpeed = 5;
                     newEnemy.color = "purple";
                 }
+                else if (Math.random() < 0.25){ // do something else?
+                    newEnemy.height = 50;
+                    newEnemy.width = 50;
+                    newEnemy.color = "lime";
+                    newEnemy.canJump = true;
+                    newEnemy.y = groundY / 2;
+		        }
                 newEnemy.collidesWithPlayer = (player) => {
                     player.gotDamaged(1);
                     objects = [];
@@ -120,11 +140,6 @@ function updateGame() {
 
             if (player.isTouching(obj)) {
                 obj.collidesWithPlayer(player);
-                if (!player.isAlive()) {
-                    player.color = "yellow";
-                    clearInterval(gameProcess);
-                    gameIsRunning = false;
-                }
             }
         }
 
@@ -134,6 +149,20 @@ function updateGame() {
         else if (player.y < player.getGroundContactY()) {
             player.accelerate(Settings.currentOptions.gravity * gameSpeed * deltaTime)
         }
+
+        if (player.y >= player.getGroundContactY() && floorIsLava) {
+            player.gotDamaged(1);
+
+            if (player.isAlive())
+                player.y = (groundY) / 4 *3;
+        }
+        if (player.y <= 0 && floorIsLava) {
+            player.gotDamaged(1);
+
+            if (player.isAlive())
+                player.y = (groundY) / 4;
+        }
+
         player.calcMove(deltaTime);
     }
 
