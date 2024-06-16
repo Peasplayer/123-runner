@@ -48,4 +48,28 @@ class GameComponent {
         ctx.fillStyle = this.color;
         ctx.fillRect(this.x, this.y, this.width, this.height);
     }
+
+    blink(color, defaultColor, timeout, count, freezeGame) {
+        if (freezeGame)
+            gameIsFrozen = true;
+
+        var counter = 1;
+        var blinkAnimation = setInterval(() => {
+            if (counter > count * 2) {
+                clearInterval(blinkAnimation);
+                if (freezeGame)
+                    gameIsFrozen = false;
+                return;
+            }
+
+            if (counter % 2 === 1) {
+                this.color = color;
+            }
+            else {
+                this.color = defaultColor;
+            }
+
+            counter++;
+        }, timeout);
+    }
 }
