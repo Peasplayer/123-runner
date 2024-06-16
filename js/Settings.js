@@ -1,6 +1,6 @@
 class Settings {
     static defaultOptions = { difficulty: 50, speedAmplifier: 0.0002, speedAmplifyingEvent: "frame", playerSize: 70,
-        minObstacleSize: 40, maxObstacleMultiplier: 3, boost: 0.2, gravity: 0.3 };
+        minObstacleSize: 40, maxObstacleMultiplier: 3, boost: 0.2, gravity: 0.3, shootCooldown: 3.0 };
     static currentOptions;
 
     static applySettings() {
@@ -16,6 +16,7 @@ class Settings {
         document.getElementById("maxObstacleMultiplier").value = this.currentOptions.maxObstacleMultiplier;
         document.getElementById("boost").value = this.currentOptions.boost;
         document.getElementById("gravity").value = this.currentOptions.gravity;
+        document.getElementById("shootCooldown").value = this.currentOptions.shootCooldown;
     }
 
     static saveSettings() {
@@ -27,7 +28,8 @@ class Settings {
             minObstacleSize: parseInt(document.getElementById("minObstacleSize").value),
             maxObstacleMultiplier: parseInt(document.getElementById("maxObstacleMultiplier").value),
             boost: parseFloat(document.getElementById("boost").value),
-            gravity: parseFloat(document.getElementById("gravity").value)
+            gravity: parseFloat(document.getElementById("gravity").value),
+            shootCooldown: parseFloat(document.getElementById("shootCooldown").value)
         }
 
         this.currentOptions = settingsObject;
