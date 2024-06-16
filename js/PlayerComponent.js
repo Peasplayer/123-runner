@@ -2,6 +2,7 @@ class PlayerComponent extends GameComponent {
     constructor(width, height, color, x, y) {
         super(width, height, color, x, y);
 
+        this.isAnimating = false;
         this.velocity = 0.0;
         this.lives = 3;
 
@@ -26,7 +27,8 @@ class PlayerComponent extends GameComponent {
     }
 
     accelerate(v) {
-        this.velocity += v;
+        if (!this.isAnimating)
+            this.velocity += v;
     }
 
     calcMove(dt) {
@@ -38,7 +40,7 @@ class PlayerComponent extends GameComponent {
             this.y = 0;
             this.velocity = 0;
         }
-        else
+        else if (!this.isAnimating)
             this.y += this.velocity * dt;
     }
 

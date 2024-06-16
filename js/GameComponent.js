@@ -7,6 +7,7 @@ class GameComponent {
         this.y = y;
         this.z = z ?? 0;
 
+        this.visible = true;
         this.movingSpeed = -3;
         this.collidesWithPlayer = (player) => {};
         this.collidesWithObject = (otherObject) => {};
@@ -44,6 +45,9 @@ class GameComponent {
     }
 
     draw() {
+        if (!this.visible)
+            return;
+
         let ctx = gameArea.context;
         ctx.fillStyle = this.color;
         ctx.fillRect(this.x, this.y, this.width, this.height);
