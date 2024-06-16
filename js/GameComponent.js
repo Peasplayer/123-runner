@@ -7,11 +7,10 @@ class GameComponent {
         this.y = y;
         this.z = z ?? 0;
 
+        this.visible = true;
         this.movingSpeed = -3;
         this.collidesWithPlayer = (player) => {};
         this.collidesWithObject = (otherObject) => {};
-
-        this.overlayColor = null;
     }
 
     getGroundContactY() {
@@ -46,11 +45,10 @@ class GameComponent {
     }
 
     draw() {
+        if (!this.visible)
+            return;
+
         let ctx = gameArea.context;
-        if (this.overlayColor){
-            ctx.fillStyle = this.overlayColor;
-            ctx.fillRect(0, 0, gameArea.canvas.width, gameArea.canvas.height);    
-        }
         ctx.fillStyle = this.color;
         ctx.fillRect(this.x, this.y, this.width, this.height);
     }
