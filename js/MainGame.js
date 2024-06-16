@@ -198,17 +198,12 @@ function updateGame() {
             player.accelerate(Settings.currentOptions.gravity * gameSpeed * (player.faster ? 2 : 1) * deltaTime)
         }
 
-        if (player.y >= player.getGroundContactY() && floorIsLava) {
+        // FloorIsLava
+        if ((player.y >= player.getGroundContactY() || player.y <= 0) && floorIsLava) {
             player.gotDamaged(1);
 
             if (player.isAlive())
-                player.y = (groundY) / 4 *3;
-        }
-        if (player.y <= 0 && floorIsLava) {
-            player.gotDamaged(1);
-
-            if (player.isAlive())
-                player.y = (groundY) / 4;
+                player.y = (groundY) / 4 * (player.y <= 0 ? 1 : 3);
         }
 
         player.calcMove(deltaTime);
@@ -219,6 +214,7 @@ function updateGame() {
 
     overlay.draw();
 
+    // LevelSwap
     if (scoreSinceNewLevel >= (level + 1) * 10) {
         canSpawnObjects = false;
         scoreSinceNewLevel = 0;
