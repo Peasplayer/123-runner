@@ -7,7 +7,8 @@ var gameIsRunning = false;
 var gameIsFrozen = false;
 var gameProcess;
 var objectSpawnCooldown = 0;
-var objectPowerUpSpawnCooldown = 0;
+var powerUpSpawnCooldown = 0;
+
 var gameSpeed = 1.0;
 var score = 0;
 var lastUpdated = 0;
@@ -21,7 +22,7 @@ function resetGame() {
 
     objects = [];
     objectSpawnCooldown = 0;
-    objectPowerUpSpawnCooldown = 0;
+    powerUpSpawnCooldown = 0;
     gameSpeed = 1.0;
     score = 0;
     lastUpdated = Date.now();
@@ -113,16 +114,7 @@ function updateGame() {
                     newEnemy.y = groundY / 2;
 		        }
                 newEnemy.collidesWithPlayer = (player) => {
-                    if (player.invincible === false) {
-                        if (player.schild === false) {
-                            player.gotDamaged(1);
-                        }
-                        else {
-                            player.schild = false;
-                        }
-                        objects = [];
-                    }
-
+                    player.gotDamaged(1, newEnemy);
                 };
                 objects.push(newEnemy);
             }
@@ -131,7 +123,7 @@ function updateGame() {
         else
             objectSpawnCooldown -= deltaTime;
 
-        if (objectPowerUpSpawnCooldown <= 0) {
+        if (powerUpSpawnCooldown <= 0) {
             var chance = Math.random() * 100 + 1;
             if (chance <= 50) {
                 var height = Settings.currentOptions.minObstacleSize;
@@ -149,10 +141,10 @@ function updateGame() {
                 }
                 objects.push(newPowerUp);
             }
-            objectPowerUpSpawnCooldown = 100 / gameSpeed;
+            powerUpSpawnCooldown = Settings.currentOptions.powerUpSpawnCooldown * 1000 / gameSpeed;
         }
-        else
-            objectPowerUpSpawnCooldown -= deltaTime;
+        else if (!player.powerUpActive)
+            powerUpSpawnCooldown -= deltaTime;
 
         objects.sort((a, b) => a.z - b.z);
         for (let obj of objects) {
@@ -182,10 +174,10 @@ function updateGame() {
         }
 
         if (isKeyPressed) {
-            player.accelerate(-Settings.currentOptions.boost * gameSpeed * deltaTime);
+            player.accelerate(-Settings.currentOptions.boost * gameSpeed * (player.faster ? 2 : 1) * deltaTime);
         }
         else if (player.y < player.getGroundContactY()) {
-            player.accelerate(Settings.currentOptions.gravity * gameSpeed * deltaTime)
+            player.accelerate(Settings.currentOptions.gravity * gameSpeed * (player.faster ? 2 : 1) * deltaTime)
         }
 
         if (player.y >= player.getGroundContactY() && floorIsLava) {
@@ -205,7 +197,7 @@ function updateGame() {
     }
 
     player.draw();
-    player.drawLives();
+    player.drawStats();
 
     document.getElementById("score").textContent = "Score: " + score;
     document.getElementById("speed").textContent = "Speed: " + (Math.round(gameSpeed * 100) / 100).toFixed(2);
