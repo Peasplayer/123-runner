@@ -1,6 +1,6 @@
 class PlayerComponent extends GameComponent {
-    constructor(width, height, color, x, y) {
-        super(width, height, color, x, y);
+    constructor(width, height, data, x, y, z, type = "color") {
+        super(width, height, data, x, y, z, type);
 
         this.isAnimating = false;
         this.velocity = 0.0;
@@ -36,8 +36,8 @@ class PlayerComponent extends GameComponent {
             this.y = this.getGroundContactY();
             this.velocity = 0;
         }
-        else if (this.y + this.velocity < 0){
-            this.y = 0;
+        else if (this.y + this.velocity < this.getCeilingContactY()){
+            this.y = this.getCeilingContactY();
             this.velocity = 0;
         }
         else if (!this.isAnimating)
@@ -57,6 +57,7 @@ class PlayerComponent extends GameComponent {
                 objects.splice(objects.indexOf(obj), 1);
 
             this.shield = false;
+            this.changeImage(ResourceManager.Ghost_Normal)
             return;
         }
 
@@ -71,7 +72,8 @@ class PlayerComponent extends GameComponent {
         gameIsFrozen = true;
         this.lastShotTime = Date.now() - Settings.currentOptions.shootCooldown * 1000;
 
-        this.blink("orange", "blue", 500, 3, true);
+        setTimeout(() => gameIsFrozen = false, 500 * 6);
+        //this.blink("orange", "blue", 500, 3, true);
     }
 
     collectPowerUp(powerUpType){
@@ -79,9 +81,12 @@ class PlayerComponent extends GameComponent {
             case 0:
                 this.lives++;
 
-                this.blink("green", "blue", 200, 2, false);
+                //this.blink("green", "blue", 200, 2, false);
                 break;
             case 1:
+                if (this.powerUpActive)
+                    return;
+
                 this.powerUpActive = this.faster = true;
                 gameSpeed /= 2;
                 setTimeout(() => {
@@ -89,30 +94,35 @@ class PlayerComponent extends GameComponent {
                     gameSpeed *= 2;
                 }, 2000)
 
-                this.blink("white", "blue", 200, 2, false);
+                //this.blink("white", "blue", 200, 2, false);
                 break;
             case 2:
                 this.shield = true;
-
-                this.blink("cyan", "blue", 200, 2, false);
+                this.changeImage(ResourceManager.Ghost_Shield);
+                //this.blink("cyan", "blue", 200, 2, false);
                 break;
             case 3:
+                if (this.powerUpActive)
+                    return;
+
                 this.powerUpActive = this.invincible = true;
+                this.changeImage(ResourceManager.Ghost_Book);
 
                 var counter = 20;
                 var blinked = true;
                 var blinkAnimation = () => {
                     if (counter <= 0.01) {
-                        this.color = "blue";
+                        //this.data = "blue";
+                        this.changeImage(ResourceManager.Ghost_Normal);
                         this.powerUpActive = this.invincible = false;
                         return;
                     }
 
-                    if (!blinked)
-                        this.color = "red";
+                    /*if (!blinked)
+                        this.data = "red";
                     else
-                        this.color = "blue";
-                    blinked = !blinked;
+                        this.data = "blue";
+                    blinked = !blinked;*/
 
                     counter *= 0.75;
                     setTimeout(blinkAnimation, 50 * counter + 100);

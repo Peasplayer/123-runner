@@ -55,9 +55,9 @@ function startGame() {
     gameArea.start();
 
     let playerSize = Settings.currentOptions.playerSize;
-    player = new PlayerComponent(playerSize, playerSize, "blue", 235,  (floorIsLava ? (groundY - playerSize) *  0.5 : groundY - playerSize), 1);
+    player = new PlayerComponent(playerSize, playerSize, ResourceManager.Ghost_Normal, 235,  (floorIsLava ? (groundY - playerSize) *  0.5 : groundY - playerSize), 1, "image");
     ground = new GameComponent(960, 30, "green", 0, groundY, -1)
-    overlay = new GameComponent(gameArea.canvas.width, gameArea.canvas.height,  "rgba(0, 0, 0, 0)", 0, 0);
+    overlay = new GameComponent(gameArea.canvas.width, gameArea.canvas.height,  "rgba(0, 0, 0, 0)", 0, 0, "color");
     portal = new GameComponent(100, 200, "yellow", 960, 190, -1);
     portal.visible = false;
 
@@ -120,7 +120,7 @@ function updateGame() {
                     var newEnemy = new EnemyComponent(xOrY ? size : Settings.currentOptions.minObstacleSize, height, "red", 960, y);
                     if (Math.random() < 0.25) { // add a slider?
                         newEnemy.movingSpeed = -5;
-                        newEnemy.color = "purple";
+                        newEnemy.data = "purple";
                     }
                     else if (Math.random() < 0.25){ // do something else?
                         newEnemy.height = 50;
@@ -150,7 +150,9 @@ function updateGame() {
                         y = 0;
 
                     var powerUpType = Math.floor(Math.random() * 4);
-                    var newPowerUp = new PowerUpComponent(Settings.currentOptions.minObstacleSize, height, "black", 960, y, powerUpType);
+                    var data = powerUpType === 0 ? ResourceManager.Item_Heart : (powerUpType === 1 ? ResourceManager.Item_Watch :
+                        (powerUpType === 2 ? ResourceManager.Item_Shield : ResourceManager.Item_Book));
+                    var newPowerUp = new PowerUpComponent(Settings.currentOptions.minObstacleSize, height, data, 960, y, 0, powerUpType, "image");
                     newPowerUp.collidesWithPlayer = (player) => {
                         player.collectPowerUp(powerUpType);
                         objects.splice(objects.indexOf(newPowerUp), 1);
@@ -257,6 +259,7 @@ function updateGame() {
 
 function sendPlayerToPortal() {
     player.isAnimating = true;
+    player.velocity = 0;
 
     const center = new Point(gameArea.canvas.width / 2, gameArea.canvas.height / 2);
     const velocity = new Point((center.x - player.x) / 250, (center.y - player.y) / 250);
@@ -270,11 +273,11 @@ function sendPlayerToPortal() {
                 var counter = 0;
                 var fadingBlack = true;
                 var fadingAnimation = setInterval(() => {
-                    overlay.color =  "rgba(0, 0, 0, " + counter + ")"
+                    overlay.data =  "rgba(0, 0, 0, " + counter + ")"
 
                     if (counter >= 1.2 && fadingBlack) {
                         portal.visible = false;
-                        player.setPos(235, groundY - player.height);
+                        player.setPos(235, player.getGroundContactY());
                         fadingBlack = false;
                     }
 
