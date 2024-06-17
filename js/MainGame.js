@@ -100,91 +100,92 @@ function updateGame() {
     ground.draw();
     portal.draw();
 
-    if (!gameIsFrozen) {
-        if (Settings.currentOptions.speedAmplifyingEvent === "frame")
-            gameSpeed += Settings.currentOptions.speedAmplifier * deltaTime;
+    if (Settings.currentOptions.speedAmplifyingEvent === "frame")
+        gameSpeed += Settings.currentOptions.speedAmplifier * deltaTime;
 
-        if (canSpawnObjects) {
-            if (objectSpawnCooldown <= 0) {
-                var chance = Math.random() * 100 + 1;
-                if (chance <= Settings.currentOptions.difficulty) {
-                    var size = Math.random() * Settings.currentOptions.maxObstacleMultiplier * Settings.currentOptions.minObstacleSize + Settings.currentOptions.minObstacleSize;
-                    var xOrY = Math.random() * 2 <= 1;
-                    var height = xOrY ? Settings.currentOptions.minObstacleSize : size;
-                    var y = Math.random() * (groundY + 1) - height / 2;
-                    if (y + height > groundY)
-                        y = groundY - height;
-                    if (y < 0)
-                        y = 0;
+    if (canSpawnObjects && !gameIsFrozen) {
+        if (objectSpawnCooldown <= 0) {
+            var chance = Math.random() * 100 + 1;
+            if (chance <= Settings.currentOptions.difficulty) {
+                var size = Math.random() * Settings.currentOptions.maxObstacleMultiplier * Settings.currentOptions.minObstacleSize + Settings.currentOptions.minObstacleSize;
+                var xOrY = Math.random() * 2 <= 1;
+                var height = xOrY ? Settings.currentOptions.minObstacleSize : size;
+                var y = Math.random() * (groundY + 1) - height / 2;
+                if (y + height > groundY)
+                    y = groundY - height;
+                if (y < 0)
+                    y = 0;
 
-                    var newEnemy = new EnemyComponent(xOrY ? size : Settings.currentOptions.minObstacleSize, height, "red", 960, y);
-                    if (Math.random() < 0.25) { // add a slider?
-                        newEnemy.movingSpeed = -5;
-                        newEnemy.data = "purple";
-                    }
-                    else if (Math.random() < 0.25){ // do something else?
-                        newEnemy.height = 50;
-                        newEnemy.width = 50;
-                        newEnemy.type = "image";
-                        newEnemy.data = ResourceManager.Enemy_Slime;
-                        newEnemy.animate = false;
-                        newEnemy.canJump = true;
-                        newEnemy.y = groundY / 2;
-                    }
-                    newEnemy.collidesWithPlayer = (player) => {
-                        player.gotDamaged(1, newEnemy);
-                    };
-                    objects.push(newEnemy);
+                var newEnemy = new EnemyComponent(xOrY ? size : Settings.currentOptions.minObstacleSize, height, "red", 960, y);
+                if (Math.random() < 0.25) { // add a slider?
+                    newEnemy.movingSpeed = -5;
+                    newEnemy.data = "purple";
                 }
-                objectSpawnCooldown = 50 / gameSpeed;
-            }
-            else
-                objectSpawnCooldown -= deltaTime;
-
-            if (powerUpSpawnCooldown <= 0) {
-                var chance = Math.random() * 100 + 1;
-                if (chance <= 50) {
-                    var height = Settings.currentOptions.minObstacleSize;
-                    var y = Math.random() * (groundY + 1) - height / 2;
-                    if (y + height  > groundY)
-                        y = groundY - height;
-                    if (y < 0)
-                        y = 0;
-
-                    var powerUpType = Math.floor(Math.random() * 4);
-                    var data = powerUpType === 0 ? ResourceManager.Item_Heart : (powerUpType === 1 ? ResourceManager.Item_Watch :
-                        (powerUpType === 2 ? ResourceManager.Item_Shield : ResourceManager.Item_Book));
-                    var newPowerUp = new PowerUpComponent(Settings.currentOptions.minObstacleSize, height, data, 960, y, 0, powerUpType, "image");
-                    newPowerUp.collidesWithPlayer = (player) => {
-                        player.collectPowerUp(powerUpType);
-                        objects.splice(objects.indexOf(newPowerUp), 1);
-                    }
-                    objects.push(newPowerUp);
+                else if (Math.random() < 0.25){ // do something else?
+                    newEnemy.height = 70;
+                    newEnemy.width = 70;
+                    newEnemy.type = "image";
+                    newEnemy.data = ResourceManager.Enemy_Slime;
+                    newEnemy.animate = false;
+                    newEnemy.canJump = true;
+                    newEnemy.y = groundY / 2;
                 }
-                powerUpSpawnCooldown = Settings.currentOptions.powerUpSpawnCooldown * 1000 / gameSpeed;
+                newEnemy.collidesWithPlayer = (player) => {
+                    player.gotDamaged(1, newEnemy);
+                };
+                objects.push(newEnemy);
             }
-            else if (!player.powerUpActive)
-                powerUpSpawnCooldown -= deltaTime;
+            objectSpawnCooldown = 50 / gameSpeed;
+        }
+        else
+            objectSpawnCooldown -= deltaTime;
+
+        if (powerUpSpawnCooldown <= 0) {
+            var chance = Math.random() * 100 + 1;
+            if (chance <= 50) {
+                var height = Settings.currentOptions.minObstacleSize;
+                var y = Math.random() * (groundY + 1) - height / 2;
+                if (y + height  > groundY)
+                    y = groundY - height;
+                if (y < 0)
+                    y = 0;
+
+                var powerUpType = Math.floor(Math.random() * 4);
+                var data = powerUpType === 0 ? ResourceManager.Item_Heart : (powerUpType === 1 ? ResourceManager.Item_Watch :
+                    (powerUpType === 2 ? ResourceManager.Item_Shield : ResourceManager.Item_Book));
+                var newPowerUp = new PowerUpComponent(Settings.currentOptions.minObstacleSize, height, data, 960, y, 0, powerUpType, "image");
+                newPowerUp.collidesWithPlayer = (player) => {
+                    player.collectPowerUp(powerUpType);
+                    objects.splice(objects.indexOf(newPowerUp), 1);
+                }
+                objects.push(newPowerUp);
+            }
+            powerUpSpawnCooldown = Settings.currentOptions.powerUpSpawnCooldown * 1000 / gameSpeed;
+        }
+        else if (!player.powerUpActive)
+            powerUpSpawnCooldown -= deltaTime;
+    }
+
+    objects.sort((a, b) => a.z - b.z);
+    for (let obj of objects) {
+        if (!gameIsFrozen)
+            obj.move(obj.movingSpeed, 0, gameSpeed * deltaTime);
+        if (obj.x < (0 - obj.width)) {
+            objects.splice(objects.indexOf(obj), 1);
+            continue;
         }
 
-        objects.sort((a, b) => a.z - b.z);
-        for (let obj of objects) {
-            obj.move(obj.movingSpeed, 0, gameSpeed * deltaTime);
-            if (obj.x < (0 - obj.width)) {
-                objects.splice(objects.indexOf(obj), 1);
-                continue;
-            }
+        if (obj.x < (player.x - obj.width) && !obj.gavePoint) {
+            score++;
+            scoreSinceNewLevel++;
+            obj.gavePoint = true;
+            if (Settings.currentOptions.speedAmplifyingEvent === "score")
+                gameSpeed += Settings.currentOptions.speedAmplifier;
+        }
 
-            if (obj.x < (player.x - obj.width) && !obj.gavePoint) {
-                score++;
-                scoreSinceNewLevel++;
-                obj.gavePoint = true;
-                if (Settings.currentOptions.speedAmplifyingEvent === "score")
-                    gameSpeed += Settings.currentOptions.speedAmplifier;
-            }
+        obj.draw();
 
-            obj.draw();
-
+        if (!gameIsFrozen) {
             for (let otherObj of objects) {
                 if (obj !== otherObj && obj.isTouching(otherObj))
                     obj.collidesWithObject(otherObj);
@@ -194,11 +195,12 @@ function updateGame() {
                 obj.collidesWithPlayer(player);
             }
         }
+    }
 
+    if (!gameIsFrozen) {
         if (isKeyPressed) {
             player.accelerate(-Settings.currentOptions.boost * gameSpeed * (player.faster ? 2 : 1) * deltaTime);
-        }
-        else if (player.y < player.getGroundContactY()) {
+        } else if (player.y < player.getGroundContactY()) {
             player.accelerate(Settings.currentOptions.gravity * gameSpeed * (player.faster ? 2 : 1) * deltaTime)
         }
 
@@ -260,7 +262,7 @@ function updateGame() {
 }
 
 function sendPlayerToPortal() {
-    player.isAnimating = true;
+    player.frozen = true;
     player.velocity = 0;
 
     const center = new Point(gameArea.canvas.width / 2, gameArea.canvas.height / 2);
@@ -286,7 +288,7 @@ function sendPlayerToPortal() {
                     if (counter <= 0 && !fadingBlack) {
                         clearInterval(fadingAnimation);
 
-                        player.isAnimating = false;
+                        player.frozen = false;
                         level++;
                         setTimeout(() => canSpawnObjects = true, 500);
                     }

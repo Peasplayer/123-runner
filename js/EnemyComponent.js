@@ -18,14 +18,14 @@ class EnemyComponent extends GameComponent {
             if (this.getGroundContactY() <= this.y) {
                 this.deltaY = 0;
                 this.y = this.getGroundContactY();
-                this.jumpCooldown -= modifier;
+                this.jumpCooldown -= modifier / 2;
                 if (this.jumpCooldown > 19) {
                     this.frame = 6;
                 }
-                else if (this.jumpCooldown > 13) {
+                else if (this.jumpCooldown < 13 && this.jumpCooldown > 5) {
                     this.frame = 7;
                 }
-                else if (this.jumpCooldown > 8) {
+                else if (this.jumpCooldown < 5) {
                     this.frame = 8;
                 }
 
@@ -50,9 +50,6 @@ class EnemyComponent extends GameComponent {
                 }
                 else if (this.deltaY > 3 && this.deltaY < 4.5) {
                     this.frame = 5;
-                }
-                else if (this.deltaY > 4.5) {
-                    this.frame = 6;
                 }
             }
         }

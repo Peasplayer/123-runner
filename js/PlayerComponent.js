@@ -2,7 +2,7 @@ class PlayerComponent extends GameComponent {
     constructor(width, height, data, x, y, z, type = "color") {
         super(width, height, data, x, y, z, type);
 
-        this.isAnimating = false;
+        this.frozen = false;
         this.velocity = 0.0;
         this.lives = 3;
 
@@ -27,7 +27,7 @@ class PlayerComponent extends GameComponent {
     }
 
     accelerate(v) {
-        if (!this.isAnimating)
+        if (!this.frozen)
             this.velocity += v;
     }
 
@@ -40,7 +40,7 @@ class PlayerComponent extends GameComponent {
             this.y = this.getCeilingContactY();
             this.velocity = 0;
         }
-        else if (!this.isAnimating)
+        else if (!this.frozen)
             this.y += this.velocity * dt;
     }
 
@@ -68,11 +68,13 @@ class PlayerComponent extends GameComponent {
             return;
         }
 
-        objects = [];
         gameIsFrozen = true;
         this.lastShotTime = Date.now() - Settings.currentOptions.shootCooldown * 1000;
 
-        setTimeout(() => gameIsFrozen = false, 500 * 6);
+        setTimeout(() => {
+            objects = [];
+            gameIsFrozen = false;
+        }, 500 * 6);
         //this.blink("orange", "blue", 500, 3, true);
     }
 

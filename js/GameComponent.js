@@ -10,6 +10,7 @@ class GameComponent {
         this.type = type;
 
         if (type === "image") {
+            this.animate = true;
             this.setupImage();
         }
 
@@ -24,7 +25,6 @@ class GameComponent {
         this.image.src = this.data.src;
         this.frame = 0;
         this.ticksPerFrame = 3;
-        this.animate = true;
     }
 
     getCeilingContactY() {
@@ -87,7 +87,7 @@ class GameComponent {
             var scale = new Point(this.width * (this.data.scale - 1),this.height * (this.data.scale - 1))
             ctx.drawImage(this.image, sx, sy, sw, sh, this.x - scale.x / 2, this.y - scale.y / 2, this.width * this.data.scale, this.height * this.data.scale);
 
-            if (this.animate) {
+            if (this.animate === true) {
                 this.ticksPerFrame--;
                 if (this.ticksPerFrame <= 0) {
                     this.frame++;
