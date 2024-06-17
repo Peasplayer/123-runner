@@ -60,8 +60,8 @@ function startGame() {
     background = new GameComponent(gameArea.canvas.width, gameArea.canvas.height, ResourceManager.Background_Forest, 0, 0, -10, "background");
     background.movingSpeed = -1;
     ground = new GameComponent(gameArea.canvas.width, gameArea.canvas.height - groundY, "rgba(0, 0, 0, 0.25)", 0, groundY, -1)
-    overlay = new GameComponent(gameArea.canvas.width, gameArea.canvas.height,  "rgba(0, 0, 0, 0)", 0, 0, "color");
-    portal = new GameComponent(100, 200, "yellow", gameArea.canvas.width, 190, -1);
+    overlay = new GameComponent(gameArea.canvas.width, gameArea.canvas.height,  "rgba(0, 0, 0, 0)", 0, 0, 10, "color");
+    portal = new GameComponent(100, 200, ResourceManager.Portal, gameArea.canvas.width, 190, -1, "image");
     portal.visible = false;
 
     gameProcess = setInterval(() => updateGame(), 1);

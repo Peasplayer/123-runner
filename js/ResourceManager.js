@@ -16,4 +16,6 @@ class ResourceManager {
     static Item_Watch = { src: "resources/item_watch.png", cols: 4, rows: 5, frames: 19, scale: 2 };
 
     static Background_Forest = { src: "resources/background_forest.jpg", cols: 1, rows: 1, frames: 1, scale: 1 };
+
+    static Portal = { src: "resources/portal_tmp.png", cols:1, rows: 1, frames: 1, scale: 1 };
 }
