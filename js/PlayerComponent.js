@@ -71,11 +71,31 @@ class PlayerComponent extends GameComponent {
         gameIsFrozen = true;
         this.lastShotTime = Date.now() - Settings.currentOptions.shootCooldown * 1000;
 
-        setTimeout(() => {
-            objects = [];
-            gameIsFrozen = false;
-        }, 500 * 6);
-        //this.blink("orange", "blue", 500, 3, true);
+        var lastUpdated = Date.now();
+        var cycles = 3;
+        this.animate = false;
+        this.ticksPerFrame = 7;
+        this.frame = 0;
+        this.changeImage(ResourceManager.Ghost_Damage);
+        var damageAnimation = setInterval(() => {
+            var now = Date.now();
+            var deltaTime = (now - lastUpdated) / 10.0;
+            this.ticksPerFrame -= deltaTime;
+            if (this.ticksPerFrame <= 0) {
+                this.frame++;
+                this.ticksPerFrame = 7;
+            }
+            if (this.frame >= this.data.frames) {
+                this.frame = 0;
+                cycles--;
+                if (cycles === 0) {
+                    objects = [];
+                    gameIsFrozen = false;
+                    clearInterval(damageAnimation);
+                }
+            }
+            lastUpdated = now;
+        }, 1);
     }
 
     collectPowerUp(powerUpType){

@@ -1,6 +1,6 @@
 class EnemyComponent extends GameComponent {
-    constructor(width, height, color, x, y, z) {
-        super(width, height, color, x, y, z)
+    constructor(width, height, data, x, y, z, type = "color") {
+        super(width, height, data, x, y, z, type)
 
         this.gavePoint = false;
 

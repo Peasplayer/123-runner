@@ -9,8 +9,8 @@ class GameComponent {
         this.hitboxTolerance = 3;
         this.type = type;
 
+        this.animate = true;
         if (type === "image") {
-            this.animate = true;
             this.setupImage();
         }
 
@@ -28,11 +28,11 @@ class GameComponent {
     }
 
     getCeilingContactY() {
-        return 0 - this.hitboxTolerance;
+        return 0;
     }
 
     getGroundContactY() {
-        return groundY - this.height + this.hitboxTolerance;
+        return groundY - this.height;
     }
 
     isTouching(comp) {
@@ -50,7 +50,6 @@ class GameComponent {
 
         return true;
     }
-    
 
     move(x, y, modifier) {
         this.x += x * modifier;
@@ -63,12 +62,13 @@ class GameComponent {
     }
 
     changeImage(data) {
+        this.image = new Image();
         this.image.src = data.src;
         this.data = data;
         this.frame = 0;
     }
 
-    draw() {
+    draw(deltaTime) {
         if (!this.visible)
             return;
 
@@ -93,7 +93,7 @@ class GameComponent {
             }
 
             if (this.animate === true) {
-                this.ticksPerFrame--;
+                this.ticksPerFrame -= deltaTime;
                 if (this.ticksPerFrame <= 0) {
                     this.frame++;
                     this.ticksPerFrame = 7;

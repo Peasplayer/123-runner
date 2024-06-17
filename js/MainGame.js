@@ -104,43 +104,60 @@ function updateGame() {
         background.move(background.movingSpeed, 0, gameSpeed * deltaTime);
     if (background.x <= - background.width)
         background.x = 0;
-    background.draw();
-    ground.draw();
-    portal.draw();
+    background.draw(deltaTime);
+    ground.draw(deltaTime);
+    portal.draw(deltaTime);
 
-    if (Settings.currentOptions.speedAmplifyingEvent === "frame")
+    if (Settings.currentOptions.speedAmplifyingEvent === "frame" && !gameIsFrozen)
         gameSpeed += Settings.currentOptions.speedAmplifier * deltaTime;
 
     if (canSpawnObjects && !gameIsFrozen) {
         if (objectSpawnCooldown <= 0) {
             var chance = Math.random() * 100 + 1;
             if (chance <= Settings.currentOptions.difficulty) {
-                var size = Math.random() * Settings.currentOptions.maxObstacleMultiplier * Settings.currentOptions.minObstacleSize + Settings.currentOptions.minObstacleSize;
-                var xOrY = Math.random() * 2 <= 1;
-                var height = xOrY ? Settings.currentOptions.minObstacleSize : size;
-                var y = Math.random() * (groundY + 1) - height / 2;
-                if (y + height > groundY)
-                    y = groundY - height;
-                if (y < 0)
-                    y = 0;
+                var newEnemy = new EnemyComponent(Settings.currentOptions.minObstacleSize,
+                    Settings.currentOptions.minObstacleSize, ResourceManager.Enemy_Cloud_1, gameArea.canvas.width, y, 1, "image");
+                newEnemy.hitboxTolerance = 8;
 
-                var newEnemy = new EnemyComponent(xOrY ? size : Settings.currentOptions.minObstacleSize, height, "red", 960, y);
-                if (Math.random() < 0.25) { // add a slider?
-                    newEnemy.movingSpeed = -5;
-                    newEnemy.data = "purple";
+                var enemyType = Math.floor(Math.random() * 4);
+                if (enemyType <= 1) {
+                    var cloudType = Math.floor(Math.random() * 3);
+                    var size = (Math.random() * Settings.currentOptions.maxObstacleMultiplier + 1) * Settings.currentOptions.minObstacleSize;
+                    if (cloudType === 1) {
+                        newEnemy.width = size;
+                        newEnemy.changeImage(ResourceManager.Enemy_Cloud_2);
+                    }
+                    else if (cloudType === 2) {
+                        newEnemy.height = size;
+                        newEnemy.changeImage(ResourceManager.Enemy_Cloud_3);
+                    }
                 }
-                else if (Math.random() < 0.25){ // do something else?
+                else if (enemyType === 2) {
+                    newEnemy.height = 112.5;
+                    newEnemy.width = 150;
+                    newEnemy.changeImage(ResourceManager.Enemy_Witch);
+                    newEnemy.movingSpeed = -5;
+                }
+                else if (enemyType === 3){
                     newEnemy.height = 70;
                     newEnemy.width = 70;
-                    newEnemy.type = "image";
-                    newEnemy.data = ResourceManager.Enemy_Slime;
+                    newEnemy.changeImage(ResourceManager.Enemy_Slime);
                     newEnemy.animate = false;
                     newEnemy.canJump = true;
                     newEnemy.y = groundY / 2;
                 }
+
                 newEnemy.collidesWithPlayer = (player) => {
                     player.gotDamaged(1, newEnemy);
                 };
+
+                var y = Math.random() * (groundY + 1) - newEnemy.height / 2;
+                if (y + newEnemy.height > groundY)
+                    y = groundY - newEnemy.height;
+                if (y < 0)
+                    y = 0;
+                newEnemy.y = y;
+
                 objects.push(newEnemy);
             }
             objectSpawnCooldown = 50 / gameSpeed;
@@ -151,17 +168,17 @@ function updateGame() {
         if (powerUpSpawnCooldown <= 0) {
             var chance = Math.random() * 100 + 1;
             if (chance <= 50) {
-                var height = Settings.currentOptions.minObstacleSize;
-                var y = Math.random() * (groundY + 1) - height / 2;
-                if (y + height  > groundY)
-                    y = groundY - height;
+                var size = 50;
+                var y = Math.random() * (groundY + 1) - size / 2;
+                if (y + size  > groundY)
+                    y = groundY - size;
                 if (y < 0)
                     y = 0;
 
                 var powerUpType = Math.floor(Math.random() * 4);
                 var data = powerUpType === 0 ? ResourceManager.Item_Heart : (powerUpType === 1 ? ResourceManager.Item_Watch :
                     (powerUpType === 2 ? ResourceManager.Item_Shield : ResourceManager.Item_Book));
-                var newPowerUp = new PowerUpComponent(Settings.currentOptions.minObstacleSize, height, data, 960, y, 0, powerUpType, "image");
+                var newPowerUp = new PowerUpComponent(size, size, data, 960, y, 0, powerUpType, "image");
                 newPowerUp.collidesWithPlayer = (player) => {
                     player.collectPowerUp(powerUpType);
                     objects.splice(objects.indexOf(newPowerUp), 1);
@@ -191,7 +208,7 @@ function updateGame() {
                 gameSpeed += Settings.currentOptions.speedAmplifier;
         }
 
-        obj.draw();
+        obj.draw(deltaTime);
 
         if (!gameIsFrozen) {
             for (let otherObj of objects) {
@@ -223,40 +240,39 @@ function updateGame() {
         player.calcMove(deltaTime);
     }
 
-    player.draw();
+    player.draw(deltaTime);
     player.drawStats();
 
-    overlay.draw();
+    overlay.draw(deltaTime);
 
-    // LevelSwap
-    if (scoreSinceNewLevel >= (level + 1) * 10) {
-        canSpawnObjects = false;
-        scoreSinceNewLevel = 0;
-        levelIsChanging = 1;
-        console.log("Change 111")
-    }
-    if (levelIsChanging === 1 && objects.length === 0) {
-        console.log("Change 22")
-        levelIsChanging = 2;
-        portal.visible = true;
-        portal.x = 960;
-        portal.movingSpeed = -4;
-    }
-    if (levelIsChanging === 2) {
-        console.log("Change 3")
-        if (portal.x <= 465) {
-            console.log("Change 4")
-            portal.movingSpeed = 0;
-            levelIsChanging = 0;
-
-            sendPlayerToPortal();
-            if (Settings.currentOptions.speedAmplifyingEvent === "level") {
-                gameSpeed += Settings.currentOptions.speedAmplifier * 10;
-            }
-            return;
+    if (!gameIsFrozen) {
+        // LevelSwap
+        if (scoreSinceNewLevel >= (level + 1) * 10) {
+            canSpawnObjects = false;
+            scoreSinceNewLevel = 0;
+            levelIsChanging = 1;
         }
+        if (levelIsChanging === 1 && objects.length === 0) {
+            levelIsChanging = 2;
+            portal.visible = true;
+            portal.x = 960;
+            portal.movingSpeed = -4;
+        }
+        if (levelIsChanging === 2) {
+            if (portal.x <= 465) {
+                portal.movingSpeed = 0;
+                background.movingSpeed = 0;
+                levelIsChanging = 0;
 
-        portal.move(portal.movingSpeed, 0, 1);
+                sendPlayerToPortal(deltaTime);
+                if (Settings.currentOptions.speedAmplifyingEvent === "level") {
+                    gameSpeed += Settings.currentOptions.speedAmplifier * 10;
+                }
+                return;
+            }
+
+            portal.move(portal.movingSpeed, 0, deltaTime);
+        }
     }
 
     document.getElementById("score").textContent = "Score: " + score;
@@ -269,15 +285,15 @@ function updateGame() {
     lastUpdated = now;
 }
 
-function sendPlayerToPortal() {
+function sendPlayerToPortal(deltaTime) {
     player.frozen = true;
     player.velocity = 0;
 
     const center = new Point(gameArea.canvas.width / 2, gameArea.canvas.height / 2);
-    const velocity = new Point((center.x - player.x) / 250, (center.y - player.y) / 250);
+    const velocity = new Point((center.x - player.x) / 150, (center.y - player.y) / 150 );
 
     const moveAnimation = setInterval(() => {
-        player.move(velocity.x, velocity.y, 1);
+        player.move(velocity.x, velocity.y, deltaTime);
 
         if (Math.abs(player.x - center.x) <= 1 && Math.abs(player.y - center.y) <= 1) {
             clearInterval(moveAnimation);
