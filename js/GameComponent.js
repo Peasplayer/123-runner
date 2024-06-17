@@ -24,7 +24,7 @@ class GameComponent {
         this.image = new Image();
         this.image.src = this.data.src;
         this.frame = 0;
-        this.ticksPerFrame = 3;
+        this.ticksPerFrame = 7;
     }
 
     getCeilingContactY() {
@@ -65,6 +65,7 @@ class GameComponent {
     changeImage(data) {
         this.image.src = data.src;
         this.data = data;
+        this.frame = 0;
     }
 
     draw() {
@@ -91,7 +92,7 @@ class GameComponent {
                 this.ticksPerFrame--;
                 if (this.ticksPerFrame <= 0) {
                     this.frame++;
-                    this.ticksPerFrame = 3;
+                    this.ticksPerFrame = 7;
                 }
                 if (this.frame >= this.data.frames)
                     this.frame = 0;
