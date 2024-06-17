@@ -125,7 +125,9 @@ function updateGame() {
                     else if (Math.random() < 0.25){ // do something else?
                         newEnemy.height = 50;
                         newEnemy.width = 50;
-                        newEnemy.color = "lime";
+                        newEnemy.type = "image";
+                        newEnemy.data = ResourceManager.Enemy_Slime;
+                        newEnemy.animate = false;
                         newEnemy.canJump = true;
                         newEnemy.y = groundY / 2;
                     }
