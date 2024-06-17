@@ -1,5 +1,6 @@
 var gameArea;
 var player;
+var background;
 var ground;
 var overlay;
 var portal;
@@ -56,9 +57,11 @@ function startGame() {
 
     let playerSize = Settings.currentOptions.playerSize;
     player = new PlayerComponent(playerSize, playerSize, ResourceManager.Ghost_Normal, 235,  (floorIsLava ? (groundY - playerSize) *  0.5 : groundY - playerSize), 1, "image");
-    ground = new GameComponent(960, 30, "green", 0, groundY, -1)
+    background = new GameComponent(gameArea.canvas.width, gameArea.canvas.height, ResourceManager.Background_Forest, 0, 0, -10, "background");
+    background.movingSpeed = -1;
+    ground = new GameComponent(gameArea.canvas.width, gameArea.canvas.height - groundY, "rgba(0, 0, 0, 0.25)", 0, groundY, -1)
     overlay = new GameComponent(gameArea.canvas.width, gameArea.canvas.height,  "rgba(0, 0, 0, 0)", 0, 0, "color");
-    portal = new GameComponent(100, 200, "yellow", 960, 190, -1);
+    portal = new GameComponent(100, 200, "yellow", gameArea.canvas.width, 190, -1);
     portal.visible = false;
 
     gameProcess = setInterval(() => updateGame(), 1);
@@ -97,6 +100,11 @@ function updateGame() {
         return;
 
     gameArea.clear();
+    if (!gameIsFrozen)
+        background.move(background.movingSpeed, 0, gameSpeed * deltaTime);
+    if (background.x <= - background.width)
+        background.x = 0;
+    background.draw();
     ground.draw();
     portal.draw();
 
@@ -281,6 +289,7 @@ function sendPlayerToPortal() {
 
                     if (counter >= 1.2 && fadingBlack) {
                         portal.visible = false;
+                        background.movingSpeed = -1;
                         player.setPos(235, player.getGroundContactY());
                         fadingBlack = false;
                     }

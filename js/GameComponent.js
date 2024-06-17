@@ -75,9 +75,9 @@ class GameComponent {
         let ctx = gameArea.context;
         if (this.type === "color") {
             ctx.fillStyle = this.data;
-            ctx.fillRect(this.x, this.y, this.width, this.height);
+            ctx.fillRect(this.x + 0.5, this.y + 0.5, this.width, this.height);
         }
-        else if (this.type === "image") {
+        else if (this.type === "image" || this.type === "background") {
             if (this.image === undefined)
                 this.setupImage();
 
@@ -86,7 +86,11 @@ class GameComponent {
             var sh = this.image.naturalHeight / this.data.rows;
             var sy = sh * Math.floor(this.frame / this.data.cols);
             var scale = new Point(this.width * (this.data.scale - 1),this.height * (this.data.scale - 1))
-            ctx.drawImage(this.image, sx, sy, sw, sh, this.x - scale.x / 2, this.y - scale.y / 2, this.width * this.data.scale, this.height * this.data.scale);
+            ctx.drawImage(this.image, sx, sy, sw, sh, this.x - scale.x / 2 + 0.5, this.y - scale.y / 2 + 0.5, this.width * this.data.scale, this.height * this.data.scale);
+
+            if (this.type === "background") {
+                ctx.drawImage(this.image, this.x + this.width, this.y, this.width, this.height);
+            }
 
             if (this.animate === true) {
                 this.ticksPerFrame--;
