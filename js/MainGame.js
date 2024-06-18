@@ -23,6 +23,8 @@ var levelIsChanging = 0;
 
 var floorIsLava = false;
 
+var audioManager;
+
 const groundY = 450;
 var settings = {
     playerSize: 70,
@@ -44,10 +46,14 @@ var difficulty = 50;
 function resetGame() {
     gameArea = new GameArea();
 
+    if (audioManager)
+        audioManager.stopAllSounds();
+
     objects = [];
     objectSpawnCooldown = 0;
     powerUpSpawnCooldown = 0;
     gameSpeed = 1.0;
+    gameIsFrozen = false;
     score = 0;
     scoreSinceNewLevel = 0;
     level = 1;
@@ -75,6 +81,12 @@ function startGame() {
     overlay = new GameComponent(gameArea.canvas.width, gameArea.canvas.height,  "rgba(0, 0, 0, 0)", 0, 0, 10, "color");
     portal = new GameComponent(100, 200, ResourceManager.Portal, gameArea.canvas.width, 190, -1, "image");
     portal.visible = false;
+
+    if(!audioManager){
+        audioManager = new AudioManager();
+        LoadSound();
+    }
+    audioManager.playRandomMusic();
 
     gameProcess = setInterval(() => updateGame(), 1);
     gameIsRunning = true;
@@ -297,12 +309,14 @@ function updateGame() {
 function sendPlayerToPortal(deltaTime) {
     player.frozen = true;
     player.velocity = 0;
+    audioManager.stopAllSounds();
 
     const center = new Point(gameArea.canvas.width / 2, gameArea.canvas.height / 2);
     const velocity = new Point((center.x - player.x) / 150, (center.y - player.y) / 150 );
 
     const moveAnimation = setInterval(() => {
         player.move(velocity.x, velocity.y, deltaTime);
+        audioManager.playSound('portal', false, 0.4);
 
         if (Math.abs(player.x - center.x) <= 1 && Math.abs(player.y - center.y) <= 1) {
             clearInterval(moveAnimation);
@@ -325,6 +339,7 @@ function sendPlayerToPortal(deltaTime) {
 
                         player.frozen = false;
                         level++;
+                        audioManager.playRandomMusic();
                         setTimeout(() => canSpawnObjects = true, 500);
                     }
 
@@ -333,6 +348,30 @@ function sendPlayerToPortal(deltaTime) {
             }, 200);
         }
     }, 10);
+}
+
+function LoadSound(){
+    // Sounds
+    audioManager.loadSound('portal', '../Sound/Portal.mp3');
+    audioManager.loadSound('damage', '../Sound/Herz_weniger.mp3');
+    audioManager.loadSound('one-heart', '../Sound/One_Heart.mp3');
+    audioManager.loadSound('Hauptmenu', '../Sound/Hauptmenu.mp3');
+    audioManager.loadSound('extra-heart', '../Sound/Herz_dazu.mp3');
+    audioManager.loadSound('powerup', '../Sound/PowerUp.mp3');
+    audioManager.loadSound('shield-brocken', '../Sound/Shield_kaputt.mp3');
+    audioManager.loadSound('slime-jump', '../Sound/Huepf.mp3');
+    audioManager.loadSound('slime-land', '../Sound/Landen.mp3');
+    audioManager.loadSound('player-shoot', '../Sound/Angriff_sound.mp3');
+    audioManager.loadSound('game-over', '../Sound/GameOverSound.mp3');
+
+    // Music
+    audioManager.loadMusic('Musik7', '../Sound/Musik1.mp3');
+    audioManager.loadMusic('Musik1', '../Sound/Musik2.mp3');
+    audioManager.loadMusic('Musik2', '../Sound/Musik3.mp3');
+    audioManager.loadMusic('Musik3', '../Sound/Musik4.mp3');
+    audioManager.loadMusic('Musik4', '../Sound/Musik5.mp3');
+    audioManager.loadMusic('Musik5', '../Sound/Musik6.mp3');
+    audioManager.loadMusic('Musik6', '../Sound/Musik7.mp3');
 }
 
 class Point {

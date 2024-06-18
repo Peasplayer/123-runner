@@ -16,6 +16,7 @@ class PlayerComponent extends GameComponent {
     shootProjectile() {
         var currentTime = Date.now();
         if (currentTime - this.lastShotTime >= settings.shootCooldown * 1000) {
+            audioManager.playSound('player-shoot');
             let newProjectile = new GameComponent(10, 10, "green", this.x + this.width, this.y + this.height / 2, 2);
             newProjectile.movingSpeed = 3;
             newProjectile.collidesWithObject = (otherObject) => {
@@ -58,15 +59,19 @@ class PlayerComponent extends GameComponent {
                 objects.splice(objects.indexOf(obj), 1);
 
             this.shield = false;
+            audioManager.playSound('shield-brocken');
             this.changeImage(ResourceManager.Ghost_Normal)
             return;
         }
 
         this.lives -= livesTaken;
-
+        audioManager.playSound('damage');
         if (!this.isAlive()) {
             this.die();
             return;
+        }
+        else if (this.lives === 1) {
+            audioManager.playSound('one-heart', true);
         }
 
         gameIsFrozen = true;
@@ -104,12 +109,14 @@ class PlayerComponent extends GameComponent {
     collectPowerUp(powerUpType){
         switch(powerUpType){
             case 0:
+                audioManager.playSound('extra-heart');
                 this.lives++;
                 break;
             case 1:
                 if (this.powerUpActive)
                     return;
 
+                audioManager.playSound('powerup');
                 this.powerUpActive = this.faster = true;
                 gameSpeed /= 2;
 
@@ -122,6 +129,7 @@ class PlayerComponent extends GameComponent {
                 if (this.invincible)
                     return;
 
+                audioManager.playSound('powerup');
                 this.shield = true;
                 this.changeImage(ResourceManager.Ghost_Shield);
                 break;
@@ -129,6 +137,7 @@ class PlayerComponent extends GameComponent {
                 if (this.powerUpActive)
                     return;
 
+                audioManager.playSound('powerup');
                 this.powerUpActive = this.invincible = true;
                 this.changeImage(ResourceManager.Ghost_Book);
 
@@ -141,8 +150,36 @@ class PlayerComponent extends GameComponent {
     }
 
     die() {
-        player.color = "yellow";
-        stopGame();
+        gameIsFrozen = true;
+        audioManager.playSound('game-over')
+
+        var lastUpdated = Date.now();
+        var cycles = 1;
+        this.animate = false;
+        this.ticksPerFrame = 7;
+        this.frame = 0;
+        this.changeImage(ResourceManager.Ghost_Death);
+        var deathAnimation = setInterval(() => {
+            var now = Date.now();
+            var deltaTime = (now - lastUpdated) / 10.0;
+            this.ticksPerFrame -= deltaTime;
+            if (this.ticksPerFrame <= 0) {
+                this.frame++;
+                this.ticksPerFrame = 7;
+            }
+            if (this.frame >= this.data.frames) {
+                this.frame = 0;
+                cycles--;
+                if (cycles === 0) {
+                    audioManager.stopAllSounds();
+                    audioManager.playSound('Hauptmenu');
+                    stopGame();
+                    clearInterval(deathAnimation);
+                }
+            }
+            lastUpdated = now;
+        }, 1);
+        //stopGame();
     }
 
     drawStats() {
