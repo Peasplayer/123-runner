@@ -35,9 +35,9 @@ var settings = {
     witchSize: 150,
     slimeSize: 70,
     boost: 0.2,
-    gravity: 0.3,
-    shootCooldown: 3.0,
-    powerUpSpawnCooldown: 0.5,
+    gravity: 0.2,
+    shootCooldown: 1.5,
+    powerUpSpawnCooldown: 0.6,
     watchTime: 4,
     bookTime: 3
 }
