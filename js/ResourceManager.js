@@ -19,7 +19,7 @@ class ResourceManager {
     static Background_BlauerWald = { src: "resources/Background_Blauer_Wald.jpg", cols: 1, rows: 1, frames: 1, scale: 1 };
     static Background_Sumpf = {src: "resources/Background_Sumpf.jpg", cols: 1, rows: 1, frames: 1, scale: 1 };
     static Background_Eylaender = {src: "resources/Background_Eyelaend.jpg", cols: 3, rows: 1, frames: 1, scale: 1 };
-    static Background_YipiLaend = {src: "resources/Background_EVIL_Yippieleand.jpg", cols: 1, rows: 1, frames: 1, scale: 1 };
+    static Background_YipiLaend = {src: "resources/Background_YippieLaend.jpg", cols: 1, rows: 1, frames: 1, scale: 1 };
     static Background_Apocalypse = {src: "resources/Background_Apocalyptic.jpg", cols: 1, rows: 1, frames: 1, scale: 1 };
 
 
