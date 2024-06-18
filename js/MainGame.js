@@ -127,14 +127,14 @@ function updateGame() {
         if (objectSpawnCooldown <= 0) {
             var chance = Math.random() * 100 + 1;
             if (chance <= difficulty) {
-                var newEnemy = new EnemyComponent(settings.minObstacleSize,
-                    settings.minObstacleSize, ResourceManager.Enemy_Cloud_1, gameArea.canvas.width, y, 1, "image");
+                var newEnemy = new EnemyComponent(settings.minCloudSize,
+                    settings.minCloudSize, ResourceManager.Enemy_Cloud_1, gameArea.canvas.width, y, 1, "image");
                 newEnemy.hitboxOffset = { left: 8, up: 8, right: 8, down: 8 };
 
                 var enemyType = Math.floor(Math.random() * 4);
                 if (enemyType <= 1) {
                     var cloudType = Math.floor(Math.random() * 3);
-                    var size = (Math.random() * settings.maxObstacleMultiplier + 1) * settings.minObstacleSize;
+                    var size = (Math.random() * settings.maxCloudMultiplier + 1) * settings.minCloudSize;
                     if (cloudType === 1) {
                         newEnemy.width = size;
                         newEnemy.changeImage(ResourceManager.Enemy_Cloud_2);
