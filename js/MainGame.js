@@ -351,6 +351,7 @@ function LoadSound(){
     audioManager.loadSound('slime-jump', '../Sound/Huepf.mp3');
     audioManager.loadSound('slime-land', '../Sound/Landen.mp3');
     audioManager.loadSound('player-shoot', '../Sound/Angriff_sound.mp3');
+    audioManager.loadSound('game-over', '../Sound/GameOverSound.mp3');
 
     // Music
     audioManager.loadMusic('Musik7', '../Sound/Musik1.mp3');

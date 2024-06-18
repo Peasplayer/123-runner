@@ -163,6 +163,7 @@ class PlayerComponent extends GameComponent {
 
     die() {
         gameIsFrozen = true;
+        audioManager.playSound('game-over')
         this.lastShotTime = Date.now() - Settings.currentOptions.shootCooldown * 1000;
 
         var lastUpdated = Date.now();
