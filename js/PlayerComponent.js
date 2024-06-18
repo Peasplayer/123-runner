@@ -16,6 +16,7 @@ class PlayerComponent extends GameComponent {
     shootProjectile() {
         var currentTime = Date.now();
         if (currentTime - this.lastShotTime >= Settings.currentOptions.shootCooldown * 1000) {
+            audioManager.playSound('player-shoot');
             let newProjectile = new GameComponent(10, 10, "green", this.x + this.width, this.y + this.height / 2);
             newProjectile.movingSpeed = 3;
             newProjectile.collidesWithObject = (otherObject) => {

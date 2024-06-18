@@ -350,6 +350,7 @@ function LoadSound(){
     audioManager.loadSound('shield-brocken', '../Sound/Shield_kaputt.mp3');
     audioManager.loadSound('slime-jump', '../Sound/Huepf.mp3');
     audioManager.loadSound('slime-land', '../Sound/Landen.mp3');
+    audioManager.loadSound('player-shoot', '../Sound/Angriff_sound.mp3');
 
     // Music
     audioManager.loadMusic('Musik7', '../Sound/Musik1.mp3');
