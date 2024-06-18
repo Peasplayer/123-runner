@@ -21,6 +21,8 @@ var level = 1;
 var canSpawnObjects = true;
 var levelIsChanging = 0;
 
+var random = new Math.random(1, 7);
+
 var floorIsLava = false;
 
 const groundY = 450;
@@ -310,8 +312,29 @@ function sendPlayerToPortal(deltaTime) {
                         portal.visible = false;
                         background.movingSpeed = -1;
                         player.setPos(235, player.getGroundContactY());
+                     switch (random) {
+                        case 1:
+                            background.changeImage(ResourceManager.Background_Forest);
+                            break;
+                        case 2:
+                            background.changeImage(ResourceManager.Background_BlauerWald);
+                            break;
+                        case 3:
+                            background.changeImage(ResourceManager.Background_Sumpf);
+                            break;
+                        case 4:
+                            background.changeImage(ResourceManager.Background_Eyländer);
+                            break;
+                        case 5:
+                            background.changeImage(ResourceManager.Background_YipiLand);
+                            break;
+                        case 6:
+                            background.changeImage(ResourceManager.Background_Apocalypse);
+                            break;
+
                         fadingBlack = false;
                     }
+                }
 
                     if (counter <= 0 && !fadingBlack) {
                         clearInterval(fadingAnimation);
