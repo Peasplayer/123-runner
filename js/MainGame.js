@@ -26,6 +26,22 @@ var floorIsLava = false;
 var audioManager;
 
 const groundY = 450;
+var settings = {
+    playerSize: 70,
+    frameSpeedAmplifier: 0.0001,
+    levelSpeedAmplifier: 0.001,
+    minCloudSize: 50,
+    maxCloudMultiplier: 3,
+    witchSize: 150,
+    slimeSize: 70,
+    boost: 0.2,
+    gravity: 0.3,
+    shootCooldown: 3.0,
+    powerUpSpawnCooldown: 0.5,
+    watchTime: 4,
+    bookTime: 3
+}
+var difficulty = 50;
 
 function resetGame() {
     gameArea = new GameArea();
@@ -44,10 +60,6 @@ function resetGame() {
     levelIsChanging = 0;
     lastUpdated = Date.now();
     floorIsLava = document.getElementById("floorIsLava").value === "true";
-
-    Settings.loadSettings();
-    if (Settings.currentOptions === undefined)
-        Settings.currentOptions = Settings.defaultOptions;
 }
 
 function startGame() {
@@ -60,8 +72,8 @@ function startGame() {
 
     gameArea.start();
 
-    let playerSize = Settings.currentOptions.playerSize;
-    player = new PlayerComponent(playerSize, playerSize, ResourceManager.Ghost_Normal, 235,  (floorIsLava ? (groundY - playerSize) *  0.5 : groundY - playerSize), 1, "image");
+    player = new PlayerComponent(settings.playerSize, settings.playerSize, ResourceManager.Ghost_Normal, 235,  (floorIsLava ? (groundY - settings.playerSize) *  0.5 : groundY - settings.playerSize), 1, "image");
+    player.hitboxOffset = { left: 8, up: 10, right: 8, down: 9 };
     background = new GameComponent(gameArea.canvas.width, gameArea.canvas.height, ResourceManager.Background_Forest, 0, 0, -10, "background");
     background.movingSpeed = -1;
     ground = new GameComponent(gameArea.canvas.width, gameArea.canvas.height - groundY, "rgba(0, 0, 0, 0.25)", 0, groundY, -1)
@@ -119,21 +131,21 @@ function updateGame() {
     ground.draw(deltaTime);
     portal.draw(deltaTime);
 
-    if (Settings.currentOptions.speedAmplifyingEvent === "frame" && !gameIsFrozen)
-        gameSpeed += Settings.currentOptions.speedAmplifier * deltaTime;
+    if (!gameIsFrozen)
+        gameSpeed += settings.frameSpeedAmplifier * deltaTime;
 
     if (canSpawnObjects && !gameIsFrozen) {
         if (objectSpawnCooldown <= 0) {
             var chance = Math.random() * 100 + 1;
-            if (chance <= Settings.currentOptions.difficulty) {
-                var newEnemy = new EnemyComponent(Settings.currentOptions.minObstacleSize,
-                    Settings.currentOptions.minObstacleSize, ResourceManager.Enemy_Cloud_1, gameArea.canvas.width, y, 1, "image");
-                newEnemy.hitboxTolerance = 8;
+            if (chance <= difficulty) {
+                var newEnemy = new EnemyComponent(settings.minCloudSize,
+                    settings.minCloudSize, ResourceManager.Enemy_Cloud_1, gameArea.canvas.width, y, 1, "image");
+                newEnemy.hitboxOffset = { left: 8, up: 8, right: 8, down: 8 };
 
                 var enemyType = Math.floor(Math.random() * 4);
                 if (enemyType <= 1) {
                     var cloudType = Math.floor(Math.random() * 3);
-                    var size = (Math.random() * Settings.currentOptions.maxObstacleMultiplier + 1) * Settings.currentOptions.minObstacleSize;
+                    var size = (Math.random() * settings.maxCloudMultiplier + 1) * settings.minCloudSize;
                     if (cloudType === 1) {
                         newEnemy.width = size;
                         newEnemy.changeImage(ResourceManager.Enemy_Cloud_2);
@@ -144,14 +156,16 @@ function updateGame() {
                     }
                 }
                 else if (enemyType === 2) {
-                    newEnemy.height = 112.5;
-                    newEnemy.width = 150;
+                    newEnemy.height = settings.witchSize * 0.75;
+                    newEnemy.width = settings.witchSize;
+                    newEnemy.hitboxOffset = { left: 15, up: 15, right: 20, down: 42 };
                     newEnemy.changeImage(ResourceManager.Enemy_Witch);
                     newEnemy.movingSpeed = -5;
                 }
                 else if (enemyType === 3){
-                    newEnemy.height = 70;
-                    newEnemy.width = 70;
+                    newEnemy.height = settings.slimeSize;
+                    newEnemy.width = settings.slimeSize;
+                    newEnemy.hitboxOffset = { left: 8, up: 15, right: 8, down: 2 };
                     newEnemy.changeImage(ResourceManager.Enemy_Slime);
                     newEnemy.animate = false;
                     newEnemy.canJump = true;
@@ -196,7 +210,7 @@ function updateGame() {
                 }
                 objects.push(newPowerUp);
             }
-            powerUpSpawnCooldown = Settings.currentOptions.powerUpSpawnCooldown * 1000 / gameSpeed;
+            powerUpSpawnCooldown = settings.powerUpSpawnCooldown * 1000 / gameSpeed;
         }
         else if (!player.powerUpActive)
             powerUpSpawnCooldown -= deltaTime;
@@ -206,7 +220,7 @@ function updateGame() {
     for (let obj of objects) {
         if (!gameIsFrozen)
             obj.move(obj.movingSpeed, 0, gameSpeed * deltaTime);
-        if (obj.x < (0 - obj.width)) {
+        if (obj.x < (0 - obj.width) || obj.x > gameArea.canvas.width) {
             objects.splice(objects.indexOf(obj), 1);
             continue;
         }
@@ -215,8 +229,6 @@ function updateGame() {
             score++;
             scoreSinceNewLevel++;
             obj.gavePoint = true;
-            if (Settings.currentOptions.speedAmplifyingEvent === "score")
-                gameSpeed += Settings.currentOptions.speedAmplifier;
         }
 
         obj.draw(deltaTime);
@@ -235,9 +247,9 @@ function updateGame() {
 
     if (!gameIsFrozen) {
         if (isKeyPressed) {
-            player.accelerate(-Settings.currentOptions.boost * gameSpeed * (player.faster ? 2 : 1) * deltaTime);
+            player.accelerate(-settings.boost * gameSpeed * (player.faster ? 2 : 1) * deltaTime);
         } else if (player.y < player.getGroundContactY()) {
-            player.accelerate(Settings.currentOptions.gravity * gameSpeed * (player.faster ? 2 : 1) * deltaTime)
+            player.accelerate(settings.gravity * gameSpeed * (player.faster ? 2 : 1) * deltaTime)
         }
 
         // FloorIsLava
@@ -276,9 +288,6 @@ function updateGame() {
                 levelIsChanging = 0;
 
                 sendPlayerToPortal(deltaTime);
-                if (Settings.currentOptions.speedAmplifyingEvent === "level") {
-                    gameSpeed += Settings.currentOptions.speedAmplifier * 10;
-                }
                 return;
             }
 
@@ -288,7 +297,7 @@ function updateGame() {
 
     document.getElementById("score").textContent = "Score: " + score;
     document.getElementById("speed").textContent = "Speed: " + (Math.round(gameSpeed * 100) / 100).toFixed(2);
-    var shootCooldown = Settings.currentOptions.shootCooldown * 1000 - (Date.now() - player.lastShotTime);
+    var shootCooldown = settings.shootCooldown * 1000 - (Date.now() - player.lastShotTime);
     document.getElementById("shootCooldown").textContent = "Shoot-Cooldown: " + (shootCooldown < 0 ? 0.0 : (shootCooldown / 1000).toFixed(1));
     document.getElementById("level").textContent = "Level: " + level;
 
@@ -317,6 +326,7 @@ function sendPlayerToPortal(deltaTime) {
                     overlay.data =  "rgba(0, 0, 0, " + counter + ")"
 
                     if (counter >= 1.2 && fadingBlack) {
+                        gameSpeed += settings.levelSpeedAmplifier;
                         portal.visible = false;
                         background.movingSpeed = -1;
                         player.setPos(235, player.getGroundContactY());
