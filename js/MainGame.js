@@ -333,8 +333,9 @@ function sendPlayerToPortal(deltaTime) {
                         case 6:
                             background.changeImage(ResourceManager.Background_Apocalypse);
                             break;
-
-                        
+                        default:
+                            background.changeImage(ResourceManager.Background_Forest);
+                            break;
                     }
                 
 
