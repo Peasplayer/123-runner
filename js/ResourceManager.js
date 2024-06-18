@@ -3,6 +3,7 @@ class ResourceManager {
     static Ghost_Shield = { src: "resources/ghost_shield.png", cols: 4, rows: 4, frames: 13, scale: 1.7 };
     static Ghost_Book = { src: "resources/ghost_book.png", cols: 4, rows: 4, frames: 13, scale: 1.7 };
     static Ghost_Damage = { src: "resources/ghost_damage.png", cols: 3, rows: 3, frames: 9, scale: 1.7 };
+    static Ghost_Death = { src: "resources/ghost_death.png", cols: 5, rows: 6, frames: 27, scale: 1.7};
 
     static Enemy_Slime = { src: "resources/enemy_slime.png", cols: 3, rows: 3, frames: 9, scale: 1 };
     static Enemy_Witch = { src: "resources/enemy_witch.png", cols: 3, rows: 5, frames: 13, scale: 1 };

@@ -23,15 +23,37 @@ var levelIsChanging = 0;
 
 var floorIsLava = false;
 
+var audioManager;
+
 const groundY = 450;
+var settings = {
+    playerSize: 70,
+    frameSpeedAmplifier: 0.0001,
+    levelSpeedAmplifier: 0.001,
+    minCloudSize: 50,
+    maxCloudMultiplier: 3,
+    witchSize: 150,
+    slimeSize: 70,
+    boost: 0.2,
+    gravity: 0.3,
+    shootCooldown: 3.0,
+    powerUpSpawnCooldown: 0.5,
+    watchTime: 4,
+    bookTime: 3
+}
+var difficulty = 50;
 
 function resetGame() {
     gameArea = new GameArea();
+
+    if (audioManager)
+        audioManager.stopAllSounds();
 
     objects = [];
     objectSpawnCooldown = 0;
     powerUpSpawnCooldown = 0;
     gameSpeed = 1.0;
+    gameIsFrozen = false;
     score = 0;
     scoreSinceNewLevel = 0;
     level = 1;
@@ -39,10 +61,6 @@ function resetGame() {
     levelIsChanging = 0;
     lastUpdated = Date.now();
     floorIsLava = document.getElementById("floorIsLava").value === "true";
-
-    Settings.loadSettings();
-    if (Settings.currentOptions === undefined)
-        Settings.currentOptions = Settings.defaultOptions;
 }
 
 function startGame() {
@@ -55,8 +73,7 @@ function startGame() {
 
     gameArea.start();
 
-    let playerSize = Settings.currentOptions.playerSize;
-    player = new PlayerComponent(playerSize, playerSize, ResourceManager.Ghost_Normal, 235,  (floorIsLava ? (groundY - playerSize) *  0.5 : groundY - playerSize), 1, "image");
+    player = new PlayerComponent(settings.playerSize, settings.playerSize, ResourceManager.Ghost_Normal, 235,  (floorIsLava ? (groundY - settings.playerSize) *  0.5 : groundY - settings.playerSize), 1, "image");
     player.hitboxOffset = { left: 8, up: 10, right: 8, down: 9 };
     background = new GameComponent(gameArea.canvas.width, gameArea.canvas.height, ResourceManager.Background_Forest, 0, 0, -10, "background");
     background.movingSpeed = -1;
@@ -64,6 +81,12 @@ function startGame() {
     overlay = new GameComponent(gameArea.canvas.width, gameArea.canvas.height,  "rgba(0, 0, 0, 0)", 0, 0, 10, "color");
     portal = new GameComponent(100, 200, ResourceManager.Portal, gameArea.canvas.width, 190, -1, "image");
     portal.visible = false;
+
+    if(!audioManager){
+        audioManager = new AudioManager();
+        LoadSound();
+    }
+    audioManager.playRandomMusic();
 
     gameProcess = setInterval(() => updateGame(), 1);
     gameIsRunning = true;
@@ -109,21 +132,21 @@ function updateGame() {
     ground.draw(deltaTime);
     portal.draw(deltaTime);
 
-    if (Settings.currentOptions.speedAmplifyingEvent === "frame" && !gameIsFrozen)
-        gameSpeed += Settings.currentOptions.speedAmplifier * deltaTime;
+    if (!gameIsFrozen)
+        gameSpeed += settings.frameSpeedAmplifier * deltaTime;
 
     if (canSpawnObjects && !gameIsFrozen) {
         if (objectSpawnCooldown <= 0) {
             var chance = Math.random() * 100 + 1;
-            if (chance <= Settings.currentOptions.difficulty) {
-                var newEnemy = new EnemyComponent(Settings.currentOptions.minObstacleSize,
-                    Settings.currentOptions.minObstacleSize, ResourceManager.Enemy_Cloud_1, gameArea.canvas.width, y, 1, "image");
+            if (chance <= difficulty) {
+                var newEnemy = new EnemyComponent(settings.minCloudSize,
+                    settings.minCloudSize, ResourceManager.Enemy_Cloud_1, gameArea.canvas.width, y, 1, "image");
                 newEnemy.hitboxOffset = { left: 8, up: 8, right: 8, down: 8 };
 
                 var enemyType = Math.floor(Math.random() * 4);
                 if (enemyType <= 1) {
                     var cloudType = Math.floor(Math.random() * 3);
-                    var size = (Math.random() * Settings.currentOptions.maxObstacleMultiplier + 1) * Settings.currentOptions.minObstacleSize;
+                    var size = (Math.random() * settings.maxCloudMultiplier + 1) * settings.minCloudSize;
                     if (cloudType === 1) {
                         newEnemy.width = size;
                         newEnemy.changeImage(ResourceManager.Enemy_Cloud_2);
@@ -134,15 +157,15 @@ function updateGame() {
                     }
                 }
                 else if (enemyType === 2) {
-                    newEnemy.height = 112.5;
-                    newEnemy.width = 150;
+                    newEnemy.height = settings.witchSize * 0.75;
+                    newEnemy.width = settings.witchSize;
                     newEnemy.hitboxOffset = { left: 15, up: 15, right: 20, down: 42 };
                     newEnemy.changeImage(ResourceManager.Enemy_Witch);
                     newEnemy.movingSpeed = -5;
                 }
                 else if (enemyType === 3){
-                    newEnemy.height = 70;
-                    newEnemy.width = 70;
+                    newEnemy.height = settings.slimeSize;
+                    newEnemy.width = settings.slimeSize;
                     newEnemy.hitboxOffset = { left: 8, up: 15, right: 8, down: 2 };
                     newEnemy.changeImage(ResourceManager.Enemy_Slime);
                     newEnemy.animate = false;
@@ -188,7 +211,7 @@ function updateGame() {
                 }
                 objects.push(newPowerUp);
             }
-            powerUpSpawnCooldown = Settings.currentOptions.powerUpSpawnCooldown * 1000 / gameSpeed;
+            powerUpSpawnCooldown = settings.powerUpSpawnCooldown * 1000 / gameSpeed;
         }
         else if (!player.powerUpActive)
             powerUpSpawnCooldown -= deltaTime;
@@ -207,8 +230,6 @@ function updateGame() {
             score++;
             scoreSinceNewLevel++;
             obj.gavePoint = true;
-            if (Settings.currentOptions.speedAmplifyingEvent === "score")
-                gameSpeed += Settings.currentOptions.speedAmplifier;
         }
 
         obj.draw(deltaTime);
@@ -227,9 +248,9 @@ function updateGame() {
 
     if (!gameIsFrozen) {
         if (isKeyPressed) {
-            player.accelerate(-Settings.currentOptions.boost * gameSpeed * (player.faster ? 2 : 1) * deltaTime);
+            player.accelerate(-settings.boost * gameSpeed * (player.faster ? 2 : 1) * deltaTime);
         } else if (player.y < player.getGroundContactY()) {
-            player.accelerate(Settings.currentOptions.gravity * gameSpeed * (player.faster ? 2 : 1) * deltaTime)
+            player.accelerate(settings.gravity * gameSpeed * (player.faster ? 2 : 1) * deltaTime)
         }
 
         // FloorIsLava
@@ -268,9 +289,6 @@ function updateGame() {
                 levelIsChanging = 0;
 
                 sendPlayerToPortal(deltaTime);
-                if (Settings.currentOptions.speedAmplifyingEvent === "level") {
-                    gameSpeed += Settings.currentOptions.speedAmplifier * 10;
-                }
                 return;
             }
 
@@ -280,7 +298,7 @@ function updateGame() {
 
     document.getElementById("score").textContent = "Score: " + score;
     document.getElementById("speed").textContent = "Speed: " + (Math.round(gameSpeed * 100) / 100).toFixed(2);
-    var shootCooldown = Settings.currentOptions.shootCooldown * 1000 - (Date.now() - player.lastShotTime);
+    var shootCooldown = settings.shootCooldown * 1000 - (Date.now() - player.lastShotTime);
     document.getElementById("shootCooldown").textContent = "Shoot-Cooldown: " + (shootCooldown < 0 ? 0.0 : (shootCooldown / 1000).toFixed(1));
     document.getElementById("level").textContent = "Level: " + level;
 
@@ -291,12 +309,14 @@ function updateGame() {
 function sendPlayerToPortal(deltaTime) {
     player.frozen = true;
     player.velocity = 0;
+    audioManager.stopAllSounds();
 
     const center = new Point(gameArea.canvas.width / 2, gameArea.canvas.height / 2);
     const velocity = new Point((center.x - player.x) / 150, (center.y - player.y) / 150 );
 
     const moveAnimation = setInterval(() => {
         player.move(velocity.x, velocity.y, deltaTime);
+        audioManager.playSound('portal', false, 0.4);
 
         if (Math.abs(player.x - center.x) <= 1 && Math.abs(player.y - center.y) <= 1) {
             clearInterval(moveAnimation);
@@ -330,6 +350,9 @@ function sendPlayerToPortal(deltaTime) {
                                 background.changeImage(ResourceManager.Background_Forest);
                                 break;
                         }
+
+                        gameSpeed += settings.levelSpeedAmplifier;
+
                         portal.visible = false;
                         background.movingSpeed = -1;
                         player.setPos(235, player.getGroundContactY());
@@ -341,6 +364,7 @@ function sendPlayerToPortal(deltaTime) {
 
                         player.frozen = false;
                         level++;
+                        audioManager.playRandomMusic();
                         setTimeout(() => canSpawnObjects = true, 500);
                     }
 
@@ -349,6 +373,30 @@ function sendPlayerToPortal(deltaTime) {
             }, 200);
         }
     }, 10);
+}
+
+function LoadSound(){
+    // Sounds
+    audioManager.loadSound('portal', '../Sound/Portal.mp3');
+    audioManager.loadSound('damage', '../Sound/Herz_weniger.mp3');
+    audioManager.loadSound('one-heart', '../Sound/One_Heart.mp3');
+    audioManager.loadSound('Hauptmenu', '../Sound/Hauptmenu.mp3');
+    audioManager.loadSound('extra-heart', '../Sound/Herz_dazu.mp3');
+    audioManager.loadSound('powerup', '../Sound/PowerUp.mp3');
+    audioManager.loadSound('shield-brocken', '../Sound/Shield_kaputt.mp3');
+    audioManager.loadSound('slime-jump', '../Sound/Huepf.mp3');
+    audioManager.loadSound('slime-land', '../Sound/Landen.mp3');
+    audioManager.loadSound('player-shoot', '../Sound/Angriff_sound.mp3');
+    audioManager.loadSound('game-over', '../Sound/GameOverSound.mp3');
+
+    // Music
+    audioManager.loadMusic('Musik7', '../Sound/Musik1.mp3');
+    audioManager.loadMusic('Musik1', '../Sound/Musik2.mp3');
+    audioManager.loadMusic('Musik2', '../Sound/Musik3.mp3');
+    audioManager.loadMusic('Musik3', '../Sound/Musik4.mp3');
+    audioManager.loadMusic('Musik4', '../Sound/Musik5.mp3');
+    audioManager.loadMusic('Musik5', '../Sound/Musik6.mp3');
+    audioManager.loadMusic('Musik6', '../Sound/Musik7.mp3');
 }
 
 class Point {

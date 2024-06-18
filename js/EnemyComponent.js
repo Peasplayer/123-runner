@@ -13,7 +13,7 @@ class EnemyComponent extends GameComponent {
         super.move(x, y, modifier);
 
         if (this.canJump) {
-            this.deltaY += modifier * Settings.currentOptions.gravity * 0.25;
+            this.deltaY += modifier * settings.gravity * 0.25;
             this.y += this.deltaY * modifier;
             if (this.getGroundContactY() <= this.y) {
                 this.deltaY = 0;
@@ -23,14 +23,16 @@ class EnemyComponent extends GameComponent {
                     this.frame = 6;
                 }
                 else if (this.jumpCooldown < 13 && this.jumpCooldown > 5) {
+                    audioManager.playSound('slime-land');
                     this.frame = 7;
                 }
                 else if (this.jumpCooldown < 5) {
+                    audioManager.playSound('slime-jump');   
                     this.frame = 8;
                 }
 
                 if (this.jumpCooldown < 0) {
-                    this.frame = 0;
+                     this.frame = 0;
                     this.deltaY = -(5);
                     this.jumpCooldown = 20;
                 }
