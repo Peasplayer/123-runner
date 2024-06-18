@@ -15,9 +15,8 @@ class PlayerComponent extends GameComponent {
 
     shootProjectile() {
         var currentTime = Date.now();
-        if (currentTime - this.lastShotTime >= Settings.currentOptions.shootCooldown * 1000) {
+        if (currentTime - this.lastShotTime >= settings.shootCooldown * 1000) {
             let newProjectile = new GameComponent(18, 18, ResourceManager.Attack_Cat, this.x + this.width, this.y + this.height / 2,3,"image");
-            //newProjectile.changeImage(ResourceManager.Attack_Cat);
             newProjectile.movingSpeed = 3;
             newProjectile.collidesWithObject = (otherObject) => {
                 objects = objects.filter(obj => obj !== otherObject && obj !== newProjectile);
@@ -81,7 +80,7 @@ class PlayerComponent extends GameComponent {
         }
 
         gameIsFrozen = true;
-        this.lastShotTime = Date.now() - Settings.currentOptions.shootCooldown * 1000;
+        this.lastShotTime = Date.now() - settings.shootCooldown * 1000;
 
         var lastUpdated = Date.now();
         var cycles = 3;
@@ -114,8 +113,6 @@ class PlayerComponent extends GameComponent {
         switch(powerUpType){
             case 0:
                 this.lives++;
-
-                //this.blink("green", "blue", 200, 2, false);
                 break;
             case 1:
                 if (this.powerUpActive)
@@ -123,17 +120,18 @@ class PlayerComponent extends GameComponent {
 
                 this.powerUpActive = this.faster = true;
                 gameSpeed /= 2;
+
                 setTimeout(() => {
                     this.powerUpActive = this.faster = false;
                     gameSpeed *= 2;
-                }, 2000)
-
-                //this.blink("white", "blue", 200, 2, false);
+                }, settings.watchTime * 1000)
                 break;
             case 2:
+                if (this.invincible)
+                    return;
+
                 this.shield = true;
                 this.changeImage(ResourceManager.Ghost_Shield);
-                //this.blink("cyan", "blue", 200, 2, false);
                 break;
             case 3:
                 if (this.powerUpActive)
@@ -142,26 +140,10 @@ class PlayerComponent extends GameComponent {
                 this.powerUpActive = this.invincible = true;
                 this.changeImage(ResourceManager.Ghost_Book);
 
-                var counter = 20;
-                var blinked = true;
-                var blinkAnimation = () => {
-                    if (counter <= 0.01) {
-                        //this.data = "blue";
-                        this.changeImage(ResourceManager.Ghost_Normal);
-                        this.powerUpActive = this.invincible = false;
-                        return;
-                    }
-
-                    /*if (!blinked)
-                        this.data = "red";
-                    else
-                        this.data = "blue";
-                    blinked = !blinked;*/
-
-                    counter *= 0.75;
-                    setTimeout(blinkAnimation, 50 * counter + 100);
-                };
-                blinkAnimation();
+                setTimeout(() => {
+                    this.changeImage(ResourceManager.Ghost_Normal);
+                    this.powerUpActive = this.invincible = false;
+                }, settings.bookTime * 1000)
                 break;
         }
     }
