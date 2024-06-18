@@ -117,7 +117,7 @@ class PlayerComponent extends GameComponent {
                 setTimeout(() => {
                     this.powerUpActive = this.faster = false;
                     gameSpeed *= 2;
-                }, 2000)
+                }, 5000)
 
                 //this.blink("white", "blue", 200, 2, false);
                 break;
