@@ -84,7 +84,7 @@ function startGame() {
 
     if(!audioManager){
         audioManager = new AudioManager();
-        LoadSound();
+        ResourceManager.LoadAudios();
     }
     audioManager.playRandomMusic();
 
@@ -348,30 +348,6 @@ function sendPlayerToPortal(deltaTime) {
             }, 200);
         }
     }, 10);
-}
-
-function LoadSound(){
-    // Sounds
-    audioManager.loadSound('portal', '../Sound/Portal.mp3');
-    audioManager.loadSound('damage', '../Sound/Herz_weniger.mp3');
-    audioManager.loadSound('one-heart', '../Sound/One_Heart.mp3');
-    audioManager.loadSound('Hauptmenu', '../Sound/Hauptmenu.mp3');
-    audioManager.loadSound('extra-heart', '../Sound/Herz_dazu.mp3');
-    audioManager.loadSound('powerup', '../Sound/PowerUp.mp3');
-    audioManager.loadSound('shield-brocken', '../Sound/Shield_kaputt.mp3');
-    audioManager.loadSound('slime-jump', '../Sound/Huepf.mp3');
-    audioManager.loadSound('slime-land', '../Sound/Landen.mp3');
-    audioManager.loadSound('player-shoot', '../Sound/Angriff_sound.mp3');
-    audioManager.loadSound('game-over', '../Sound/GameOverSound.mp3');
-
-    // Music
-    audioManager.loadMusic('Musik7', '../Sound/Musik1.mp3');
-    audioManager.loadMusic('Musik1', '../Sound/Musik2.mp3');
-    audioManager.loadMusic('Musik2', '../Sound/Musik3.mp3');
-    audioManager.loadMusic('Musik3', '../Sound/Musik4.mp3');
-    audioManager.loadMusic('Musik4', '../Sound/Musik5.mp3');
-    audioManager.loadMusic('Musik5', '../Sound/Musik6.mp3');
-    audioManager.loadMusic('Musik6', '../Sound/Musik7.mp3');
 }
 
 class Point {

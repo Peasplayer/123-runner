@@ -24,4 +24,28 @@ class ResourceManager {
     static Portal_Blue = { src: "resources/portal/blue.png", cols: 3, rows: 2, frames: 4, scale: 1 };
     static Portal_Green = { src: "resources/portal/green.png", cols: 3, rows: 2, frames: 4, scale: 1 };
     static Portal_Purple = { src: "resources/portal/purple.png", cols: 3, rows: 2, frames: 4, scale: 1 };
+
+    static LoadAudios(){
+        // Sounds
+        audioManager.loadSound('portal', 'resources/sound/Portal.mp3');
+        audioManager.loadSound('damage', 'resources/sound/Herz_weniger.mp3');
+        audioManager.loadSound('one-heart', 'resources/sound/One_Heart.mp3');
+        audioManager.loadSound('Hauptmenu', 'resources/sound/Hauptmenu.mp3');
+        audioManager.loadSound('extra-heart', 'resources/sound/Herz_dazu.mp3');
+        audioManager.loadSound('powerup', 'resources/sound/PowerUp.mp3');
+        audioManager.loadSound('shield-brocken', 'resources/sound/Shield_kaputt.mp3');
+        audioManager.loadSound('slime-jump', 'resources/sound/Huepf.mp3');
+        audioManager.loadSound('slime-land', 'resources/sound/Landen.mp3');
+        audioManager.loadSound('player-shoot', 'resources/sound/Angriff_sound.mp3');
+        audioManager.loadSound('game-over', 'resources/sound/GameOverSound.mp3');
+
+        // Music
+        audioManager.loadMusic('Musik7', 'resources/sound/Musik1.mp3');
+        audioManager.loadMusic('Musik1', 'resources/sound/Musik2.mp3');
+        audioManager.loadMusic('Musik2', 'resources/sound/Musik3.mp3');
+        audioManager.loadMusic('Musik3', 'resources/sound/Musik4.mp3');
+        audioManager.loadMusic('Musik4', 'resources/sound/Musik5.mp3');
+        audioManager.loadMusic('Musik5', 'resources/sound/Musik6.mp3');
+        audioManager.loadMusic('Musik6', 'resources/sound/Musik7.mp3');
+    }
 }
