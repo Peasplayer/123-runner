@@ -57,13 +57,19 @@ class PlayerComponent extends GameComponent {
                 objects.splice(objects.indexOf(obj), 1);
 
             this.shield = false;
+            audioManager.playSound('shield-brocken');
             this.changeImage(ResourceManager.Ghost_Normal)
             return;
         }
 
         this.lives -= livesTaken;
-
+        audioManager.playSound('damage');
+        if (this.lives == 1 && this.isAlive){
+           audioManager.playSound('one-heart', true);
+        }
         if (!this.isAlive()) {
+            audioManager.stopAllSounds();
+            audioManager.playSound('Hauptmenu');
             this.die();
             return;
         }
@@ -101,6 +107,7 @@ class PlayerComponent extends GameComponent {
     collectPowerUp(powerUpType){
         switch(powerUpType){
             case 0:
+                audioManager.playSound('extra-heart');
                 this.lives++;
 
                 //this.blink("green", "blue", 200, 2, false);
@@ -108,7 +115,7 @@ class PlayerComponent extends GameComponent {
             case 1:
                 if (this.powerUpActive)
                     return;
-
+                audioManager.playSound('powerup');
                 this.powerUpActive = this.faster = true;
                 gameSpeed /= 2;
                 setTimeout(() => {
@@ -119,6 +126,7 @@ class PlayerComponent extends GameComponent {
                 //this.blink("white", "blue", 200, 2, false);
                 break;
             case 2:
+                audioManager.playSound('powerup');
                 this.shield = true;
                 this.changeImage(ResourceManager.Ghost_Shield);
                 //this.blink("cyan", "blue", 200, 2, false);
@@ -126,7 +134,7 @@ class PlayerComponent extends GameComponent {
             case 3:
                 if (this.powerUpActive)
                     return;
-
+                audioManager.playSound('powerup');
                 this.powerUpActive = this.invincible = true;
                 this.changeImage(ResourceManager.Ghost_Book);
 

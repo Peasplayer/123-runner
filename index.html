@@ -9,6 +9,7 @@
             }
         </style>
 
+        <script src="js/AudioManager.js"></script>
         <script src="js/MainGame.js"></script>
         <script src="js/GameArea.js"></script>
         <script src="js/GameComponent.js"></script>
@@ -19,6 +20,16 @@
         <script src="js/ResourceManager.js"></script>
     </head>
     <body>
+        <audio id="Hauptmenu" src="Sound/Hauptmenu.mp3"></audio>
+        <script>
+            var audio = document.getElementById('Hauptmenu');
+            audio.play();
+            function stopAudioAndStartGame(){
+                audio.pause();
+                audio.currentTime = 0;
+                startGame();
+            }
+        </script>
         <button onclick="location.href='./settings.html'">Einstellungen</button> </br>
         <label>Modus</label>
         <select id="floorIsLava">
@@ -32,6 +43,6 @@
 
         </br>
 
-        <button onclick="startGame()">Start</button> </br>
+        <button onclick="stopAudioAndStartGame()">Start</button> </br>
     </body>
 </html>
