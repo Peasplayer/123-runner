@@ -307,37 +307,35 @@ function sendPlayerToPortal(deltaTime) {
                     overlay.data =  "rgba(0, 0, 0, " + counter + ")"
 
                     if (counter >= 1.2 && fadingBlack) {
+                        switch (Math.floor(Math.random() * 6) + 1) {
+                            case 1:
+                                background.changeImage(ResourceManager.Background_Forest);
+                                break;
+                            case 2:
+                                background.changeImage(ResourceManager.Background_BlauerWald);
+                                break;
+                            case 3:
+                                background.changeImage(ResourceManager.Background_Sumpf);
+                                break;
+                            case 4:
+                                background.changeImage(ResourceManager.Background_Eylaender);
+                                break;
+                            case 5:
+                                background.changeImage(ResourceManager.Background_YipiLaend);
+                                break;
+                            case 6:
+                                background.changeImage(ResourceManager.Background_Apocalypse);
+                                break;
+                            default:
+                                background.changeImage(ResourceManager.Background_Forest);
+                                break;
+                        }
                         portal.visible = false;
                         background.movingSpeed = -1;
                         player.setPos(235, player.getGroundContactY());
                         fadingBlack = false;
                     }
-
-                    switch (Math.floor(Math.random() * 6) + 1) {
-                        case 1:
-                            background.changeImage(ResourceManager.Background_Forest);
-                            break;
-                        case 2:
-                            background.changeImage(ResourceManager.Background_BlauerWald);
-                            break;
-                        case 3:
-                            background.changeImage(ResourceManager.Background_Sumpf);
-                            break;
-                        case 4:
-                            background.changeImage(ResourceManager.Background_Eylaender);
-                            break;
-                        case 5:
-                            background.changeImage(ResourceManager.Background_YipiLaend);
-                            break;
-                        case 6:
-                            background.changeImage(ResourceManager.Background_Apocalypse);
-                            break;
-                        default:
-                            background.changeImage(ResourceManager.Background_Forest);
-                            break;
-                    }
                 
-
                     if (counter <= 0 && !fadingBlack) {
                         clearInterval(fadingAnimation);
 
