@@ -40,7 +40,7 @@ class PlayerComponent extends GameComponent {
         var currentTime = Date.now();
         // don't change back if no need to reset!
         // (animation)
-        if (this.beforeShoot != null && currentTime - this.lastShotTime >= Settings.currentOptions.shootCooldown * 500) {
+        if (this.beforeShoot != null && this.frame == this.data.frames - 1) {
             this.changeImage(this.beforeShoot);
             this.beforeShoot = null;
         }
