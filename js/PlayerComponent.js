@@ -16,8 +16,8 @@ class PlayerComponent extends GameComponent {
     shootProjectile() {
         var currentTime = Date.now();
         if (currentTime - this.lastShotTime >= settings.shootCooldown * 1000) {
-            let newProjectile = new GameComponent(10, 10, "green", this.x + this.width, this.y + this.height / 2, 2);
             audioManager.playSound('player-shoot');
+            let newProjectile = new GameComponent(10, 10, "green", this.x + this.width, this.y + this.height / 2, 2);
             newProjectile.movingSpeed = 3;
             newProjectile.collidesWithObject = (otherObject) => {
                 if (otherObject.constructor.name !== "PowerUpComponent")
@@ -66,12 +66,12 @@ class PlayerComponent extends GameComponent {
 
         this.lives -= livesTaken;
         audioManager.playSound('damage');
-        if (this.lives == 1 && this.isAlive){
-           audioManager.playSound('one-heart', true);
-        }
         if (!this.isAlive()) {
             this.die();
             return;
+        }
+        else if (this.lives === 1) {
+            audioManager.playSound('one-heart', true);
         }
 
         gameIsFrozen = true;
