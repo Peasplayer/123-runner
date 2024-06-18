@@ -304,6 +304,7 @@ function updateGame() {
 
     // reset for dt
     lastUpdated = now;
+    this.gameArea.drawScore(this.score);
 }
 
 function sendPlayerToPortal(deltaTime) {
