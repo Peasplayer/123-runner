@@ -57,6 +57,7 @@ function startGame() {
 
     let playerSize = Settings.currentOptions.playerSize;
     player = new PlayerComponent(playerSize, playerSize, ResourceManager.Ghost_Normal, 235,  (floorIsLava ? (groundY - playerSize) *  0.5 : groundY - playerSize), 1, "image");
+    player.hitboxOffset = { left: 8, up: 10, right: 8, down: 9 };
     background = new GameComponent(gameArea.canvas.width, gameArea.canvas.height, ResourceManager.Background_Forest, 0, 0, -10, "background");
     background.movingSpeed = -1;
     ground = new GameComponent(gameArea.canvas.width, gameArea.canvas.height - groundY, "rgba(0, 0, 0, 0.25)", 0, groundY, -1)
@@ -117,7 +118,7 @@ function updateGame() {
             if (chance <= Settings.currentOptions.difficulty) {
                 var newEnemy = new EnemyComponent(Settings.currentOptions.minObstacleSize,
                     Settings.currentOptions.minObstacleSize, ResourceManager.Enemy_Cloud_1, gameArea.canvas.width, y, 1, "image");
-                newEnemy.hitboxTolerance = 8;
+                newEnemy.hitboxOffset = { left: 8, up: 8, right: 8, down: 8 };
 
                 var enemyType = Math.floor(Math.random() * 4);
                 if (enemyType <= 1) {
@@ -135,12 +136,14 @@ function updateGame() {
                 else if (enemyType === 2) {
                     newEnemy.height = 112.5;
                     newEnemy.width = 150;
+                    newEnemy.hitboxOffset = { left: 15, up: 15, right: 20, down: 42 };
                     newEnemy.changeImage(ResourceManager.Enemy_Witch);
                     newEnemy.movingSpeed = -5;
                 }
                 else if (enemyType === 3){
                     newEnemy.height = 70;
                     newEnemy.width = 70;
+                    newEnemy.hitboxOffset = { left: 8, up: 15, right: 8, down: 2 };
                     newEnemy.changeImage(ResourceManager.Enemy_Slime);
                     newEnemy.animate = false;
                     newEnemy.canJump = true;

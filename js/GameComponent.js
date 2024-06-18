@@ -6,7 +6,7 @@ class GameComponent {
         this.x = x;
         this.y = y;
         this.z = z ?? 0;
-        this.hitboxTolerance = 3;
+        this.hitboxOffset = { left: 3, up: 3, right: 3, down: 3 };
         this.type = type;
 
         this.animate = true;
@@ -36,11 +36,11 @@ class GameComponent {
     }
 
     isTouching(comp) {
-        var pointA1 = new Point(this.x + this.hitboxTolerance, this.y + this.hitboxTolerance);
-        var pointA2 = new Point(this.x + this.width - this.hitboxTolerance, this.y + this.height - this.hitboxTolerance);
+        var pointA1 = new Point(this.x + this.hitboxOffset.left, this.y + this.hitboxOffset.up);
+        var pointA2 = new Point(this.x + this.width - this.hitboxOffset.right, this.y + this.height - this.hitboxOffset.down);
 
-        var pointB1 = new Point(comp.x, comp.y);
-        var pointB2 = new Point(comp.x + comp.width, comp.y + comp.height);
+        var pointB1 = new Point(comp.x + comp.hitboxOffset.left, comp.y + comp.hitboxOffset.up);
+        var pointB2 = new Point(comp.x + comp.width - comp.hitboxOffset.right, comp.y + comp.height - comp.hitboxOffset.down);
 
         if (pointA1.x > pointB2.x || pointB1.x > pointA2.x)
            return false;
