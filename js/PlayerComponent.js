@@ -16,14 +16,19 @@ class PlayerComponent extends GameComponent {
     shootProjectile() {
         var currentTime = Date.now();
         if (currentTime - this.lastShotTime >= Settings.currentOptions.shootCooldown * 1000) {
-            let newProjectile = new GameComponent(10, 10, "green", this.x + this.width, this.y + this.height / 2, 2);
+            let newProjectile = new GameComponent(15, 15, ResourceManager.Attack_Cat, this.x + this.width, this.y + this.height / 2,3,"image");
+            //newProjectile.changeImage(ResourceManager.Attack_Cat);
             newProjectile.movingSpeed = 3;
             newProjectile.collidesWithObject = (otherObject) => {
-                if (otherObject.constructor.name !== "PowerUpComponent")
-                    objects = objects.filter(obj => obj !== otherObject && obj !== newProjectile);
+                objects = objects.filter(obj => obj !== otherObject && obj !== newProjectile);
             };
+            console.log(newProjectile);
             objects.push(newProjectile);
             this.lastShotTime = currentTime;
+            // resetable
+            this.beforeShoot = this.data;
+            // change to shoot state
+            this.changeImage(ResourceManager.Ghost_Shoot);
         }
     }
 
@@ -33,6 +38,13 @@ class PlayerComponent extends GameComponent {
     }
 
     calcMove(dt) {
+        var currentTime = Date.now();
+        // don't change back if no need to reset!
+        // (animation)
+        if (this.beforeShoot != null && currentTime - this.lastShotTime >= Settings.currentOptions.shootCooldown * 500) {
+            this.changeImage(this.beforeShoot);
+            this.beforeShoot = null;
+        }
         if (this.y + this.velocity > this.getGroundContactY()) {
             this.y = this.getGroundContactY();
             this.velocity = 0;
@@ -90,8 +102,6 @@ class PlayerComponent extends GameComponent {
                 this.frame = 0;
                 cycles--;
                 if (cycles === 0) {
-                    this.changeImage(ResourceManager.Ghost_Normal);
-                    this.animate = true;
                     objects = [];
                     gameIsFrozen = false;
                     clearInterval(damageAnimation);
