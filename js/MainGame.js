@@ -312,6 +312,8 @@ function sendPlayerToPortal(deltaTime) {
                         portal.visible = false;
                         background.movingSpeed = -1;
                         player.setPos(235, player.getGroundContactY());
+                        fadingBlack = false;
+                    }
                      switch (random) {
                         case 1:
                             background.changeImage(ResourceManager.Background_Forest);
@@ -332,9 +334,9 @@ function sendPlayerToPortal(deltaTime) {
                             background.changeImage(ResourceManager.Background_Apocalypse);
                             break;
 
-                        fadingBlack = false;
+                        
                     }
-                }
+                
 
                     if (counter <= 0 && !fadingBlack) {
                         clearInterval(fadingAnimation);
