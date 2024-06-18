@@ -79,7 +79,7 @@ function startGame() {
     background.movingSpeed = -1;
     ground = new GameComponent(gameArea.canvas.width, gameArea.canvas.height - groundY, "rgba(0, 0, 0, 0.25)", 0, groundY, -1)
     overlay = new GameComponent(gameArea.canvas.width, gameArea.canvas.height,  "rgba(0, 0, 0, 0)", 0, 0, 10, "color");
-    portal = new GameComponent(100, 200, ResourceManager.Portal, gameArea.canvas.width, 190, -1, "image");
+    portal = new GameComponent(100, 200, ResourceManager.Portal_Purple, gameArea.canvas.width, 190, -1, "image");
     portal.visible = false;
 
     if(!audioManager){
