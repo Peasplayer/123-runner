@@ -67,7 +67,7 @@ class PlayerComponent extends GameComponent {
 
             this.shield = false;
             audioManager.playSound('shield-brocken');
-            this.changeImage(ResourceManager.Ghost_Normal)
+            this.otherLayers = this.otherLayers.filter(layer => layer.name !== "shield");
             return;
         }
 
@@ -117,7 +117,7 @@ class PlayerComponent extends GameComponent {
 
                 audioManager.playSound('powerup');
                 this.shield = true;
-                this.changeImage(ResourceManager.Ghost_Shield);
+                this.otherLayers.push({name: "shield", data: ResourceManager.Ghost_Shield_2});
                 break;
             case 3:
                 if (this.powerUpActive)
@@ -125,10 +125,10 @@ class PlayerComponent extends GameComponent {
 
                 audioManager.playSound('powerup');
                 this.powerUpActive = this.invincible = true;
-                this.changeImage(ResourceManager.Ghost_Book);
+                this.otherLayers.push({name: "book", data: ResourceManager.Ghost_Book_2});
 
                 setTimeout(() => {
-                    this.changeImage(ResourceManager.Ghost_Normal);
+                    this.otherLayers = this.otherLayers.filter(layer => layer.name !== "book");
                     this.powerUpActive = this.invincible = false;
                 }, settings.bookTime * 1000)
                 break;
