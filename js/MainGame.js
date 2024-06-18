@@ -198,7 +198,7 @@ function updateGame() {
     for (let obj of objects) {
         if (!gameIsFrozen)
             obj.move(obj.movingSpeed, 0, gameSpeed * deltaTime);
-        if (obj.x < (0 - obj.width)) {
+        if (obj.x < (0 - obj.width) || obj.x > gameArea.canvas.width) {
             objects.splice(objects.indexOf(obj), 1);
             continue;
         }

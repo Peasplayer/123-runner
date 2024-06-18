@@ -16,10 +16,11 @@ class PlayerComponent extends GameComponent {
     shootProjectile() {
         var currentTime = Date.now();
         if (currentTime - this.lastShotTime >= Settings.currentOptions.shootCooldown * 1000) {
-            let newProjectile = new GameComponent(10, 10, "green", this.x + this.width, this.y + this.height / 2);
+            let newProjectile = new GameComponent(10, 10, "green", this.x + this.width, this.y + this.height / 2, 2);
             newProjectile.movingSpeed = 3;
             newProjectile.collidesWithObject = (otherObject) => {
-                objects = objects.filter(obj => obj !== otherObject && obj !== newProjectile);
+                if (otherObject.constructor.name !== "PowerUpComponent")
+                    objects = objects.filter(obj => obj !== otherObject && obj !== newProjectile);
             };
             objects.push(newProjectile);
             this.lastShotTime = currentTime;
@@ -89,6 +90,8 @@ class PlayerComponent extends GameComponent {
                 this.frame = 0;
                 cycles--;
                 if (cycles === 0) {
+                    this.changeImage(ResourceManager.Ghost_Normal);
+                    this.animate = true;
                     objects = [];
                     gameIsFrozen = false;
                     clearInterval(damageAnimation);
