@@ -21,8 +21,6 @@ var level = 1;
 var canSpawnObjects = true;
 var levelIsChanging = 0;
 
-var random = new Math.random(1, 7);
-
 var floorIsLava = false;
 
 const groundY = 450;
@@ -314,7 +312,8 @@ function sendPlayerToPortal(deltaTime) {
                         player.setPos(235, player.getGroundContactY());
                         fadingBlack = false;
                     }
-                     switch (random) {
+
+                    switch (Math.floor(Math.random() * 6) + 1) {
                         case 1:
                             background.changeImage(ResourceManager.Background_Forest);
                             break;
