@@ -15,7 +15,7 @@ class PlayerComponent extends GameComponent {
 
     shootProjectile() {
         var currentTime = Date.now();
-        if (currentTime - this.lastShotTime >= Settings.currentOptions.shootCooldown * 1000) {
+        if (currentTime - this.lastShotTime >= settings.shootCooldown * 1000) {
             let newProjectile = new GameComponent(10, 10, "green", this.x + this.width, this.y + this.height / 2, 2);
             newProjectile.movingSpeed = 3;
             newProjectile.collidesWithObject = (otherObject) => {
@@ -70,7 +70,7 @@ class PlayerComponent extends GameComponent {
         }
 
         gameIsFrozen = true;
-        this.lastShotTime = Date.now() - Settings.currentOptions.shootCooldown * 1000;
+        this.lastShotTime = Date.now() - settings.shootCooldown * 1000;
 
         var lastUpdated = Date.now();
         var cycles = 3;
