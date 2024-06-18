@@ -6,8 +6,7 @@ class AudioManager {
     }
 
     loadSound(name, src){
-        var audio = new Audio(src);
-        this.sounds[name] = audio;
+        this.sounds[name] = new Audio(src);
     }
 
     loadMusic(name, src){
@@ -15,7 +14,7 @@ class AudioManager {
     }
 
     playSound(name, loop = false, volume = 1.0){
-        if (this.sounds[name]){
+        if (this.sounds[name]) {
             this.sounds[name].loop = loop;
             this.sounds[name].volume = volume;
             this.sounds[name].play();
@@ -23,20 +22,20 @@ class AudioManager {
     }
 
     stopSound(name){
-        if (this.sounds[name]){
+        if (this.sounds[name]) {
             this.sounds[name].pause();
             this.sounds[name].currentTime = 0;
         }
     }
     stopAllSounds(){
-        for (let name in this.sounds){
+        for (let name in this.sounds) {
             this.stopSound(name);
         }
     }
     playRandomMusic(){
         var randomIndex = Math.floor(Math.random() * this.musicFiles.length);
         var randomMusic = this.musicFiles[randomIndex];
-        if (this.currentMusic == randomMusic.name)
+        if (this.currentMusic === randomMusic.name)
             this.playRandomMusic();
         this.currentMusic = randomMusic.name;
         this.loadSound(randomMusic.name, randomMusic.src);

@@ -53,6 +53,7 @@ function resetGame() {
     objectSpawnCooldown = 0;
     powerUpSpawnCooldown = 0;
     gameSpeed = 1.0;
+    gameIsFrozen = false;
     score = 0;
     scoreSinceNewLevel = 0;
     level = 1;
