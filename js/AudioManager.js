@@ -35,8 +35,11 @@ class AudioManager {
     playRandomMusic(){
         var randomIndex = Math.floor(Math.random() * this.musicFiles.length);
         var randomMusic = this.musicFiles[randomIndex];
-        if (this.currentMusic === randomMusic.name)
+        if (this.currentMusic === randomMusic.name) {
             this.playRandomMusic();
+            return;
+        }
+        this.stopSound(this.currentMusic);
         this.currentMusic = randomMusic.name;
         this.loadSound(randomMusic.name, randomMusic.src);
         this.playSound(randomMusic.name, true, 0.25); 

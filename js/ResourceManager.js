@@ -20,6 +20,12 @@ class ResourceManager {
     static Item_Watch = { src: "resources/item/watch.png", cols: 4, rows: 5, frames: 19, scale: 2 };
 
     static Background_Forest = { src: "resources/background/forest.jpg", cols: 1, rows: 1, frames: 1, scale: 1 };
+    static Background_BlauerWald = { src: "resources/background/blauer_wald.jpg", cols: 1, rows: 1, frames: 1, scale: 1 };
+    static Background_Sumpf = {src: "resources/background/sumpf.jpg", cols: 1, rows: 1, frames: 1, scale: 1 };
+    static Background_EyeLaend = {src: "resources/background/eyelaend.jpg", cols: 1, rows: 3, frames: 3, scale: 1, ticksPerFrame: 15 };
+    static Background_YipiLaend = {src: "resources/background/yippie_laend.jpg", cols: 1, rows: 1, frames: 1, scale: 1 };
+    static Background_Apocalypse = {src: "resources/background/apocalyptic.jpg", cols: 1, rows: 1, frames: 1, scale: 1 };
+
 
     static Portal_Blue = { src: "resources/portal/blue.png", cols: 3, rows: 2, frames: 4, scale: 1 };
     static Portal_Green = { src: "resources/portal/green.png", cols: 3, rows: 2, frames: 4, scale: 1 };

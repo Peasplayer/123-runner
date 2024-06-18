@@ -24,7 +24,7 @@ class GameComponent {
         this.image = new Image();
         this.image.src = this.data.src;
         this.frame = 0;
-        this.ticksPerFrame = 7;
+        this.ticksPerFrame = this.data.ticksPerFrame ?? 7;
     }
 
     getCeilingContactY() {
@@ -118,14 +118,18 @@ class GameComponent {
             ctx.drawImage(this.image, sx, sy, sw, sh, this.x - scale.x / 2 + 0.5, this.y - scale.y / 2 + 0.5, this.width * this.data.scale, this.height * this.data.scale);
 
             if (this.type === "background") {
-                ctx.drawImage(this.image, this.x + this.width, this.y, this.width, this.height);
+                /*var sw = this.image.naturalWidth / this.data.cols;
+                var sx = sw * (this.frame % this.data.cols);
+                var sh = this.image.naturalHeight / this.data.rows;
+                var sy = sh * Math.floor(this.frame / this.data.cols);*/
+                ctx.drawImage(this.image, sx, sy, sw, sh, this.x + this.width, this.y, this.width, this.height);
             }
 
             if (this.animate === true) {
                 this.ticksPerFrame -= deltaTime;
                 if (this.ticksPerFrame <= 0) {
                     this.frame++;
-                    this.ticksPerFrame = 7;
+                    this.ticksPerFrame = this.data.ticksPerFrame ?? 7;
                 }
                 if (this.frame >= this.data.frames)
                     this.frame = 0;
