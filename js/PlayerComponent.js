@@ -15,12 +15,13 @@ class PlayerComponent extends GameComponent {
 
     shootProjectile() {
         var currentTime = Date.now();
-        if (currentTime - this.lastShotTime >= Settings.currentOptions.shootCooldown * 1000) {
+        if (currentTime - this.lastShotTime >= settings.shootCooldown * 1000) {
             audioManager.playSound('player-shoot');
-            let newProjectile = new GameComponent(10, 10, "green", this.x + this.width, this.y + this.height / 2);
+            let newProjectile = new GameComponent(10, 10, "green", this.x + this.width, this.y + this.height / 2, 2);
             newProjectile.movingSpeed = 3;
             newProjectile.collidesWithObject = (otherObject) => {
-                objects = objects.filter(obj => obj !== otherObject && obj !== newProjectile);
+                if (otherObject.constructor.name !== "PowerUpComponent")
+                    objects = objects.filter(obj => obj !== otherObject && obj !== newProjectile);
             };
             objects.push(newProjectile);
             this.lastShotTime = currentTime;
@@ -74,7 +75,7 @@ class PlayerComponent extends GameComponent {
         }
 
         gameIsFrozen = true;
-        this.lastShotTime = Date.now() - Settings.currentOptions.shootCooldown * 1000;
+        this.lastShotTime = Date.now() - settings.shootCooldown * 1000;
 
         var lastUpdated = Date.now();
         var cycles = 3;
@@ -94,6 +95,8 @@ class PlayerComponent extends GameComponent {
                 this.frame = 0;
                 cycles--;
                 if (cycles === 0) {
+                    this.changeImage(ResourceManager.Ghost_Normal);
+                    this.animate = true;
                     objects = [];
                     gameIsFrozen = false;
                     clearInterval(damageAnimation);
@@ -108,8 +111,6 @@ class PlayerComponent extends GameComponent {
             case 0:
                 audioManager.playSound('extra-heart');
                 this.lives++;
-
-                //this.blink("green", "blue", 200, 2, false);
                 break;
             case 1:
                 if (this.powerUpActive)
@@ -117,18 +118,18 @@ class PlayerComponent extends GameComponent {
                 audioManager.playSound('powerup');
                 this.powerUpActive = this.faster = true;
                 gameSpeed /= 2;
+
                 setTimeout(() => {
                     this.powerUpActive = this.faster = false;
                     gameSpeed *= 2;
-                }, 2000)
-
-                //this.blink("white", "blue", 200, 2, false);
+                }, settings.watchTime * 1000)
                 break;
             case 2:
+                if (this.invincible)
+                    return;
                 audioManager.playSound('powerup');
                 this.shield = true;
                 this.changeImage(ResourceManager.Ghost_Shield);
-                //this.blink("cyan", "blue", 200, 2, false);
                 break;
             case 3:
                 if (this.powerUpActive)
@@ -137,26 +138,10 @@ class PlayerComponent extends GameComponent {
                 this.powerUpActive = this.invincible = true;
                 this.changeImage(ResourceManager.Ghost_Book);
 
-                var counter = 20;
-                var blinked = true;
-                var blinkAnimation = () => {
-                    if (counter <= 0.01) {
-                        //this.data = "blue";
-                        this.changeImage(ResourceManager.Ghost_Normal);
-                        this.powerUpActive = this.invincible = false;
-                        return;
-                    }
-
-                    /*if (!blinked)
-                        this.data = "red";
-                    else
-                        this.data = "blue";
-                    blinked = !blinked;*/
-
-                    counter *= 0.75;
-                    setTimeout(blinkAnimation, 50 * counter + 100);
-                };
-                blinkAnimation();
+                setTimeout(() => {
+                    this.changeImage(ResourceManager.Ghost_Normal);
+                    this.powerUpActive = this.invincible = false;
+                }, settings.bookTime * 1000)
                 break;
         }
     }
