@@ -324,7 +324,7 @@ function sendPlayerToPortal(deltaTime) {
                             background.changeImage(ResourceManager.Background_Sumpf);
                             break;
                         case 4:
-                            background.changeImage(ResourceManager.Background_Eyländer);
+                            background.changeImage(ResourceManager.Background_Eylaender);
                             break;
                         case 5:
                             background.changeImage(ResourceManager.Background_YipiLand);
