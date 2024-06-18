@@ -22,7 +22,6 @@ class PlayerComponent extends GameComponent {
             newProjectile.collidesWithObject = (otherObject) => {
                 objects = objects.filter(obj => obj !== otherObject && obj !== newProjectile);
             };
-            console.log(newProjectile);
             objects.push(newProjectile);
             this.lastShotTime = currentTime;
             // resetable
