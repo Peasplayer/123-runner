@@ -69,8 +69,6 @@ class PlayerComponent extends GameComponent {
            audioManager.playSound('one-heart', true);
         }
         if (!this.isAlive()) {
-            audioManager.stopAllSounds();
-            audioManager.playSound('Hauptmenu');
             this.die();
             return;
         }
@@ -164,8 +162,36 @@ class PlayerComponent extends GameComponent {
     }
 
     die() {
-        player.color = "yellow";
-        stopGame();
+        gameIsFrozen = true;
+        this.lastShotTime = Date.now() - Settings.currentOptions.shootCooldown * 1000;
+
+        var lastUpdated = Date.now();
+        var cycles = 1;
+        this.animate = false;
+        this.ticksPerFrame = 7;
+        this.frame = 0;
+        this.changeImage(ResourceManager.Ghost_Death);
+        var deathAnimation = setInterval(() => {
+            var now = Date.now();
+            var deltaTime = (now - lastUpdated) / 10.0;
+            this.ticksPerFrame -= deltaTime;
+            if (this.ticksPerFrame <= 0) {
+                this.frame++;
+                this.ticksPerFrame = 7;
+            }
+            if (this.frame >= this.data.frames) {
+                this.frame = 0;
+                cycles--;
+                if (cycles === 0) {
+                    audioManager.stopAllSounds();
+                    audioManager.playSound('Hauptmenu');
+                    stopGame();
+                    clearInterval(deathAnimation);
+                }
+            }
+            lastUpdated = now;
+        }, 1);
+        //stopGame();
     }
 
     drawStats() {
