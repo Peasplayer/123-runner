@@ -68,6 +68,35 @@ class GameComponent {
         this.frame = 0;
     }
 
+    animateManually(data, cycles, callback, maxTicksPerFrame = 7) {
+        clearInterval(this.lastAnimation);
+        this.animate = false;
+        this.ticksPerFrame = maxTicksPerFrame;
+        this.frame = 0;
+
+        var lastUpdated = Date.now();
+        var remainingCycles = cycles;
+        this.changeImage(data);
+        this.lastAnimation = setInterval(() => {
+            var now = Date.now();
+            var deltaTime = (now - lastUpdated) / 10.0;
+            this.ticksPerFrame -= deltaTime;
+            if (this.ticksPerFrame <= 0) {
+                this.frame++;
+                this.ticksPerFrame = maxTicksPerFrame;
+            }
+            if (this.frame >= this.data.frames) {
+                this.frame = 0;
+                remainingCycles--;
+                if (remainingCycles === 0) {
+                    callback();
+                    clearInterval(this.lastAnimation);
+                }
+            }
+            lastUpdated = now;
+        }, 1);
+    }
+
     draw(deltaTime) {
         if (!this.visible)
             return;
@@ -102,29 +131,5 @@ class GameComponent {
                     this.frame = 0;
             }
         }
-    }
-
-    blink(color, defaultColor, timeout, count, freezeGame) {
-        if (freezeGame)
-            gameIsFrozen = true;
-
-        var counter = 1;
-        var blinkAnimation = setInterval(() => {
-            if (counter > count * 2) {
-                clearInterval(blinkAnimation);
-                if (freezeGame)
-                    gameIsFrozen = false;
-                return;
-            }
-
-            if (counter % 2 === 1) {
-                this.data = color;
-            }
-            else {
-                this.data = defaultColor;
-            }
-
-            counter++;
-        }, timeout);
     }
 }

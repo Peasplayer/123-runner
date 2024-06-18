@@ -17,7 +17,14 @@ class PlayerComponent extends GameComponent {
         var currentTime = Date.now();
         if (currentTime - this.lastShotTime >= settings.shootCooldown * 1000) {
             audioManager.playSound('player-shoot');
-            let newProjectile = new GameComponent(10, 10, "green", this.x + this.width, this.y + this.height / 2, 2);
+            var currentData = this.data;
+            this.animateManually(ResourceManager.Ghost_Shoot, 1, () => {
+                this.changeImage(currentData);
+                this.animate = true;
+            }, 4);
+
+            let newProjectile = new GameComponent(18, 18, ResourceManager.Attack_Cat, this.x + this.width, this.y + this.height / 2, 3, "image");
+            newProjectile.animateManually(ResourceManager.Attack_Cat, 1, () => newProjectile.frame = 11);
             newProjectile.movingSpeed = 3;
             newProjectile.collidesWithObject = (otherObject) => {
                 if (otherObject.constructor.name !== "PowerUpComponent")
@@ -77,33 +84,12 @@ class PlayerComponent extends GameComponent {
         gameIsFrozen = true;
         this.lastShotTime = Date.now() - settings.shootCooldown * 1000;
 
-        var lastUpdated = Date.now();
-        var cycles = 3;
-        this.animate = false;
-        this.ticksPerFrame = 7;
-        this.frame = 0;
-        this.changeImage(ResourceManager.Ghost_Damage);
-        var damageAnimation = setInterval(() => {
-            var now = Date.now();
-            var deltaTime = (now - lastUpdated) / 10.0;
-            this.ticksPerFrame -= deltaTime;
-            if (this.ticksPerFrame <= 0) {
-                this.frame++;
-                this.ticksPerFrame = 7;
-            }
-            if (this.frame >= this.data.frames) {
-                this.frame = 0;
-                cycles--;
-                if (cycles === 0) {
-                    this.changeImage(ResourceManager.Ghost_Normal);
-                    this.animate = true;
-                    objects = [];
-                    gameIsFrozen = false;
-                    clearInterval(damageAnimation);
-                }
-            }
-            lastUpdated = now;
-        }, 1);
+        this.animateManually(ResourceManager.Ghost_Damage, 3, () => {
+            this.changeImage(ResourceManager.Ghost_Normal);
+            this.animate = true;
+            objects = [];
+            gameIsFrozen = false;
+        });
     }
 
     collectPowerUp(powerUpType){
