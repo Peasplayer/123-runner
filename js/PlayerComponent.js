@@ -169,18 +169,12 @@ class PlayerComponent extends GameComponent {
     }
 
     drawStats() {
-        let ctx = gameArea.context;
+        var newImage = new Image();
+        newImage.src = "resources/heart.png";
         var currentX = 0;
         for (let i = 0; i < this.lives; i++) {
-            ctx.fillStyle = "red";
-            currentX = 10 + i * 20;
-            ctx.fillRect(currentX, 10, 15, 15);
-        }
-
-        if (this.shield) {
-            ctx.fillStyle = "cyan";
-            currentX += 20;
-            ctx.fillRect(currentX, 10, 15, 15);
+            currentX= 10 + i * (newImage.naturalWidth+10);
+            gameArea.context.drawImage(newImage, currentX, 10);
         }
     }
 }
